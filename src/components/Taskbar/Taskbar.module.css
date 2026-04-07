@@ -1,0 +1,58 @@
+.taskbar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: var(--win-taskbar-height);
+  background: var(--win-bg-taskbar);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  display: flex;
+  align-items: center;
+  z-index: 9999;
+  box-shadow: var(--win-shadow-taskbar);
+}
+
+.left {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.center {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.right {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  margin-left: auto;
+}
+
+.startButton {
+  width: 48px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background var(--win-transition-fast);
+}
+
+.startButton:hover {
+  background: var(--win-bg-hover);
+}
+
+.startButtonActive {
+  background: var(--win-bg-active);
+}
+
+.startButtonSvg {
+  width: 18px;
+  height: 18px;
+}

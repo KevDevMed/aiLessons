@@ -1,0 +1,86 @@
+.icon {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  width: 76px;
+  padding: 6px 4px;
+  cursor: pointer;
+  border: 1px solid transparent;
+  user-select: none;
+}
+
+.icon:hover {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+.selected {
+  background: rgba(0, 120, 215, 0.3) !important;
+  border-color: rgba(0, 120, 215, 0.5) !important;
+}
+
+.iconImage {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  line-height: 1;
+  margin-bottom: 4px;
+  pointer-events: none;
+}
+
+.label {
+  font-size: 11px;
+  color: var(--win-text-primary);
+  text-align: center;
+  word-break: break-word;
+  line-height: 1.3;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+  max-width: 100%;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+/* Large icons */
+.iconLarge {
+  width: 96px;
+}
+
+.iconLarge .iconImage {
+  width: 48px;
+  height: 48px;
+  font-size: 44px;
+}
+
+.iconLarge .label {
+  font-size: 12px;
+}
+
+/* Small icons */
+.iconSmall {
+  width: 56px;
+  padding: 4px 2px;
+}
+
+.iconSmall .iconImage {
+  width: 20px;
+  height: 20px;
+  font-size: 16px;
+  margin-bottom: 2px;
+}
+
+.iconSmall .label {
+  font-size: 9px;
+}
+
+/* Dragging state */
+.dragging {
+  opacity: 0.8;
+  z-index: 1000;
+  pointer-events: none;
+}

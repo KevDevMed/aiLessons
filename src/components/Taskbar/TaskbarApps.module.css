@@ -1,0 +1,44 @@
+.container {
+  display: flex;
+  align-items: center;
+  height: 100%;
+}
+
+.appButton {
+  position: relative;
+  width: 42px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 20px;
+  transition: background var(--win-transition-fast);
+  border: none;
+  background: transparent;
+}
+
+.appButton:hover {
+  background: var(--win-bg-hover);
+}
+
+.focused {
+  background: var(--win-bg-active);
+}
+
+.indicator {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  height: 2px;
+  width: 12px;
+  background: var(--win-accent);
+  border-radius: 1px;
+  transition: width var(--win-transition-fast);
+}
+
+.focusedIndicator {
+  width: 20px;
+  height: 2px;
+}

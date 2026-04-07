@@ -1,0 +1,73 @@
+.terminal {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: #0c0c0c;
+  color: #cccccc;
+  font-family: var(--win-font-mono);
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.output {
+  flex: 1;
+  overflow-y: auto;
+  padding: 12px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.line {
+  min-height: 20px;
+}
+
+.prompt {
+  color: #cccccc;
+}
+
+.error {
+  color: #f87171;
+}
+
+.ascii {
+  color: #76d672;
+  white-space: pre;
+}
+
+.inputLine {
+  display: flex;
+  align-items: center;
+  padding: 0 12px 12px;
+}
+
+.inputPrompt {
+  color: #cccccc;
+  white-space: pre;
+  flex-shrink: 0;
+}
+
+.input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: #cccccc;
+  font-family: var(--win-font-mono);
+  font-size: 14px;
+  caret-color: #cccccc;
+  padding: 0;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+.cursor {
+  display: inline-block;
+  width: 8px;
+  height: 16px;
+  background: #cccccc;
+  animation: blink 1s step-end infinite;
+  vertical-align: text-bottom;
+}

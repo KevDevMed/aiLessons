@@ -1,0 +1,91 @@
+.calculator {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  font-family: var(--win-font);
+  background: var(--win-bg-window);
+  color: var(--win-text-primary);
+  user-select: none;
+}
+
+.display {
+  padding: 16px 20px 12px;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.expression {
+  font-size: 13px;
+  color: var(--win-text-secondary);
+  min-height: 20px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.currentValue {
+  font-size: 42px;
+  font-weight: 300;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-height: 52px;
+  line-height: 52px;
+}
+
+.buttons {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1px;
+  padding: 1px;
+  flex: 1;
+}
+
+.btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  font-family: var(--win-font);
+  border: none;
+  cursor: pointer;
+  transition: background var(--win-transition-fast);
+  color: var(--win-text-primary);
+  outline: none;
+}
+
+.btn:active {
+  filter: brightness(0.85);
+}
+
+.btnNumber {
+  background: #3b3b3b;
+}
+
+.btnNumber:hover {
+  background: #444;
+}
+
+.btnOperator {
+  background: #323232;
+}
+
+.btnOperator:hover {
+  background: #3a3a3a;
+}
+
+.btnTop {
+  background: #323232;
+}
+
+.btnTop:hover {
+  background: #3a3a3a;
+}
+
+.btnEquals {
+  background: var(--win-accent);
+}
+
+.btnEquals:hover {
+  background: var(--win-accent-hover, #1a86d9);
+}

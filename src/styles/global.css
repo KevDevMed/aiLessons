@@ -1,0 +1,80 @@
+@import './variables.css';
+@import './animations.css';
+
+*, *::before, *::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body, #root {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  font-family: var(--win-font);
+  font-size: 14px;
+  color: var(--win-text-primary);
+  background: #000;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* Scrollbar - Windows 10 style */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+/* Selection */
+::selection {
+  background: var(--win-accent);
+  color: white;
+}
+
+/* Links */
+a {
+  color: var(--win-accent-light);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+/* Button reset */
+button {
+  font-family: inherit;
+  font-size: inherit;
+  color: inherit;
+  background: none;
+  border: none;
+  cursor: pointer;
+  outline: none;
+}
+
+/* Input reset */
+input, textarea {
+  font-family: inherit;
+  font-size: inherit;
+  color: inherit;
+  background: var(--win-bg-input);
+  border: 1px solid var(--win-border);
+  outline: none;
+}
+
+input:focus, textarea:focus {
+  border-color: var(--win-accent);
+}

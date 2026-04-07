@@ -1,0 +1,73 @@
+.titleBar {
+  height: var(--win-titlebar-height);
+  display: flex;
+  align-items: center;
+  background: var(--win-bg-titlebar);
+  flex-shrink: 0;
+  user-select: none;
+}
+
+.dragArea {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  height: 100%;
+  min-width: 0;
+  padding-left: 8px;
+  gap: 8px;
+}
+
+.appIcon {
+  width: 16px;
+  height: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  flex-shrink: 0;
+}
+
+.title {
+  font-size: 12px;
+  color: var(--win-text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.titleInactive {
+  color: var(--win-text-disabled);
+}
+
+.controls {
+  display: flex;
+  height: 100%;
+  flex-shrink: 0;
+}
+
+.controlButton {
+  width: 46px;
+  height: var(--win-titlebar-height);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background var(--win-transition-fast);
+  background: transparent;
+  border: none;
+  color: var(--win-text-primary);
+}
+
+.controlButton:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.closeButton:hover {
+  background: var(--win-close-hover) !important;
+  color: #ffffff;
+}
+
+.controlIcon {
+  width: 10px;
+  height: 10px;
+}

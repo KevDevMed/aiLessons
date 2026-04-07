@@ -1,0 +1,236 @@
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: var(--win-taskbar-height);
+  z-index: 9998;
+}
+
+.menu {
+  position: fixed;
+  bottom: var(--win-taskbar-height);
+  left: 0;
+  width: var(--win-start-menu-width);
+  max-height: calc(100vh - var(--win-taskbar-height) - 20px);
+  height: 580px;
+  background: var(--win-bg-start-menu);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  display: flex;
+  flex-direction: column;
+  z-index: 9998;
+  animation: startMenuOpen 200ms ease forwards;
+  box-shadow: 0 -2px 20px rgba(0, 0, 0, 0.5);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.body {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+}
+
+.appListColumn {
+  width: 250px;
+  border-right: 1px solid rgba(255, 255, 255, 0.06);
+  overflow-y: auto;
+  padding: 8px 0;
+}
+
+.tilesColumn {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px;
+}
+
+.appItem {
+  display: flex;
+  align-items: center;
+  height: 36px;
+  padding: 0 16px;
+  cursor: pointer;
+  transition: background var(--win-transition-fast);
+  gap: 12px;
+}
+
+.appItem:hover {
+  background: var(--win-bg-hover);
+}
+
+.appItemIcon {
+  font-size: 18px;
+  width: 24px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.appItemName {
+  font-size: 13px;
+  color: var(--win-text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.letterHeader {
+  padding: 8px 16px 4px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--win-accent);
+}
+
+.tilesGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.tile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  background: var(--win-accent);
+  transition: filter var(--win-transition-fast), opacity var(--win-transition-fast);
+  gap: 4px;
+  overflow: hidden;
+}
+
+.tile:hover {
+  filter: brightness(1.15);
+}
+
+.tileSmall {
+  width: 60px;
+  height: 60px;
+}
+
+.tileMedium {
+  width: 124px;
+  height: 124px;
+}
+
+.tileWide {
+  width: 252px;
+  height: 124px;
+}
+
+.tileLarge {
+  width: 252px;
+  height: 252px;
+}
+
+.tileIcon {
+  font-size: 24px;
+}
+
+.tileName {
+  font-size: 11px;
+  color: var(--win-text-primary);
+  text-align: center;
+  padding: 0 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+.bottom {
+  display: flex;
+  align-items: center;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  height: 48px;
+  padding: 0 4px;
+}
+
+.powerButton {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background var(--win-transition-fast);
+}
+
+.powerButton:hover {
+  background: var(--win-bg-hover);
+}
+
+.powerIcon {
+  width: 16px;
+  height: 16px;
+  color: var(--win-text-primary);
+}
+
+.userArea {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 12px;
+  height: 40px;
+  cursor: pointer;
+  transition: background var(--win-transition-fast);
+  margin-left: auto;
+}
+
+.userArea:hover {
+  background: var(--win-bg-hover);
+}
+
+.userAvatar {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--win-accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+}
+
+.userName {
+  font-size: 12px;
+  color: var(--win-text-primary);
+}
+
+.powerMenu {
+  position: absolute;
+  bottom: 100%;
+  left: 0;
+  background: var(--win-bg-context-menu);
+  border: 1px solid var(--win-border);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.4);
+  min-width: 160px;
+  padding: 4px 0;
+  z-index: 10000;
+}
+
+.powerMenuItem {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  height: 36px;
+  padding: 0 16px;
+  cursor: pointer;
+  width: 100%;
+  gap: 12px;
+  font-size: 13px;
+  color: var(--win-text-primary);
+  background: none;
+  border: none;
+  transition: background var(--win-transition-fast);
+}
+
+.powerMenuItem:hover {
+  background: var(--win-bg-hover);
+}
+
+.powerMenuIcon {
+  font-size: 16px;
+  width: 20px;
+  text-align: center;
+  flex-shrink: 0;
+}

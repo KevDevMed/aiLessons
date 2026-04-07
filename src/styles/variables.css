@@ -1,0 +1,57 @@
+:root {
+  /* Windows 10 Accent */
+  --win-accent: #0078d4;
+  --win-accent-light: #429ce3;
+  --win-accent-dark: #005a9e;
+  --win-accent-hover: #1a86d9;
+
+  /* Backgrounds */
+  --win-bg-desktop: #0078d4;
+  --win-bg-window: #2b2b2b;
+  --win-bg-titlebar: #1f1f1f;
+  --win-bg-titlebar-inactive: #2b2b2b;
+  --win-bg-taskbar: rgba(24, 24, 24, 0.95);
+  --win-bg-start-menu: rgba(31, 31, 31, 0.95);
+  --win-bg-context-menu: #2b2b2b;
+  --win-bg-input: #1f1f1f;
+  --win-bg-hover: rgba(255, 255, 255, 0.06);
+  --win-bg-active: rgba(255, 255, 255, 0.08);
+  --win-bg-surface: #333333;
+
+  /* Text */
+  --win-text-primary: #ffffff;
+  --win-text-secondary: #999999;
+  --win-text-disabled: #666666;
+
+  /* Borders */
+  --win-border: #333333;
+  --win-border-light: #444444;
+  --win-border-accent: var(--win-accent);
+
+  /* Dimensions */
+  --win-taskbar-height: 40px;
+  --win-titlebar-height: 32px;
+  --win-start-menu-width: 640px;
+  --win-start-menu-height: 720px;
+
+  /* No rounded corners in Windows 10 */
+  --win-radius: 0px;
+  --win-radius-sm: 2px;
+
+  /* Shadows */
+  --win-shadow-window: 0 2px 8px rgba(0, 0, 0, 0.5), 0 0 1px rgba(0, 0, 0, 0.3);
+  --win-shadow-menu: 0 4px 12px rgba(0, 0, 0, 0.5);
+  --win-shadow-taskbar: 0 -1px 4px rgba(0, 0, 0, 0.3);
+
+  /* Transitions */
+  --win-transition-fast: 100ms ease;
+  --win-transition-normal: 200ms ease;
+  --win-transition-slow: 300ms ease;
+
+  /* Fonts */
+  --win-font: 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  --win-font-mono: 'Cascadia Code', 'Consolas', 'SF Mono', monospace;
+
+  /* Close button */
+  --win-close-hover: #e81123;
+}

@@ -1,0 +1,117 @@
+.container {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: #0a0a1a;
+  overflow: hidden;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 16px;
+  background: rgba(0, 0, 0, 0.4);
+  color: #fff;
+  font-size: 14px;
+  font-family: var(--win-font-mono);
+}
+
+.score {
+  color: #00bfff;
+  font-weight: 600;
+}
+
+.level {
+  color: #ff6b9d;
+  font-weight: 600;
+}
+
+.gameArea {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  gap: 16px;
+  padding: 12px;
+}
+
+.canvas {
+  display: block;
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+}
+
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  align-items: center;
+}
+
+.sidebarLabel {
+  color: #777;
+  font-size: 11px;
+  font-family: var(--win-font-mono);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 4px;
+  text-align: center;
+}
+
+.nextCanvas {
+  display: block;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 4px;
+  background: rgba(0, 0, 0, 0.3);
+}
+
+.sidebarStats {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-family: var(--win-font-mono);
+  font-size: 12px;
+  color: #aaa;
+}
+
+.statRow {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.statValue {
+  color: #fff;
+  font-weight: 600;
+}
+
+.overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.75);
+  color: #fff;
+  gap: 12px;
+  z-index: 1;
+}
+
+.overlayTitle {
+  font-size: 28px;
+  font-weight: 700;
+}
+
+.overlayScore {
+  font-size: 18px;
+  color: #00bfff;
+}
+
+.overlayHint {
+  font-size: 14px;
+  color: #999;
+}

@@ -1,0 +1,170 @@
+.spreadsheet {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: var(--win-bg-window);
+  outline: none;
+}
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 12px;
+  background: var(--win-bg-surface);
+  border-bottom: 1px solid var(--win-border);
+  gap: 8px;
+}
+
+.fileName {
+  font-size: 12px;
+  color: var(--win-text-primary);
+  font-weight: 600;
+}
+
+.toolbarActions {
+  display: flex;
+  gap: 4px;
+}
+
+.toolBtn {
+  background: transparent;
+  border: 1px solid var(--win-border);
+  color: var(--win-text-secondary);
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: 2px;
+  cursor: pointer;
+  font-family: var(--win-font);
+}
+
+.toolBtn:hover {
+  background: var(--win-hover);
+  color: var(--win-text-primary);
+}
+
+.formulaBar {
+  display: flex;
+  align-items: center;
+  padding: 3px 8px;
+  background: var(--win-bg-window);
+  border-bottom: 1px solid var(--win-border);
+  gap: 6px;
+  min-height: 26px;
+}
+
+.cellRef {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--win-text-primary);
+  min-width: 36px;
+  text-align: center;
+  padding: 2px 4px;
+  border: 1px solid var(--win-border);
+  border-radius: 2px;
+  background: var(--win-bg-surface);
+}
+
+.formulaSep {
+  font-size: 11px;
+  font-style: italic;
+  color: var(--win-text-secondary);
+  user-select: none;
+}
+
+.formulaInput {
+  flex: 1;
+  border: 1px solid var(--win-border);
+  border-radius: 2px;
+  padding: 2px 6px;
+  font-size: 12px;
+  font-family: var(--win-font);
+  color: var(--win-text-primary);
+  background: var(--win-bg-window);
+  outline: none;
+}
+
+.formulaInput:focus {
+  border-color: var(--win-accent);
+}
+
+.tableWrapper {
+  flex: 1;
+  overflow: auto;
+  padding: 0;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+  font-family: var(--win-font);
+}
+
+.headerCell {
+  background: #217346;
+  color: #fff;
+  padding: 6px 14px;
+  text-align: left;
+  font-weight: 600;
+  white-space: nowrap;
+  border: 1px solid #1a5c37;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+.rowNum {
+  background: var(--win-bg-surface);
+  color: var(--win-text-secondary);
+  padding: 4px 8px;
+  text-align: center;
+  font-size: 10px;
+  min-width: 32px;
+  border: 1px solid var(--win-border);
+  user-select: none;
+}
+
+.cell {
+  padding: 5px 14px;
+  border: 1px solid var(--win-border);
+  color: var(--win-text-primary);
+  white-space: nowrap;
+  background: var(--win-bg-window);
+  cursor: cell;
+  min-width: 80px;
+  position: relative;
+}
+
+.cell:hover {
+  background: var(--win-bg-hover);
+}
+
+.cellSelected {
+  outline: 2px solid var(--win-accent);
+  outline-offset: -1px;
+  background: var(--win-bg-window) !important;
+}
+
+.cellInput {
+  position: absolute;
+  inset: 0;
+  border: none;
+  outline: none;
+  padding: 5px 14px;
+  font-size: 12px;
+  font-family: var(--win-font);
+  color: var(--win-text-primary);
+  background: var(--win-bg-window);
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.statusBar {
+  padding: 4px 12px;
+  font-size: 11px;
+  color: var(--win-text-secondary);
+  background: var(--win-bg-surface);
+  border-top: 1px solid var(--win-border);
+}

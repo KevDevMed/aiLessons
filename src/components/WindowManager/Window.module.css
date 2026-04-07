@@ -1,0 +1,27 @@
+.window {
+  display: flex;
+  flex-direction: column;
+  background: var(--win-bg-window);
+  box-shadow: var(--win-shadow-window);
+  overflow: hidden;
+  animation: windowOpen 150ms ease forwards;
+}
+
+.focused {
+  border-top: 1px solid var(--win-accent);
+}
+
+.unfocused {
+  border-top: 1px solid transparent;
+}
+
+.unfocused .titleBar {
+  background: var(--win-bg-titlebar-inactive);
+}
+
+.content {
+  flex: 1;
+  overflow: hidden;
+  position: relative;
+  background: var(--win-bg-window);
+}

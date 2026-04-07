@@ -1,0 +1,92 @@
+.menu {
+  position: fixed;
+  background: var(--win-bg-context-menu);
+  border: 1px solid var(--win-border);
+  box-shadow: var(--win-shadow-menu);
+  min-width: 200px;
+  padding: 4px 0;
+  z-index: 99999;
+  animation: menuFadeIn 100ms ease forwards;
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  height: 32px;
+  padding: 0 28px 0 12px;
+  cursor: pointer;
+  transition: background var(--win-transition-fast);
+  gap: 10px;
+  position: relative;
+}
+
+.item:hover {
+  background: var(--win-bg-hover);
+}
+
+.disabled {
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+.itemIcon {
+  width: 16px;
+  text-align: center;
+  font-size: 14px;
+  flex-shrink: 0;
+}
+
+.itemLabel {
+  font-size: 12px;
+  color: var(--win-text-primary);
+  flex: 1;
+  white-space: nowrap;
+}
+
+.itemShortcut {
+  font-size: 11px;
+  color: var(--win-text-secondary);
+  margin-left: auto;
+  padding-left: 24px;
+}
+
+.divider {
+  height: 1px;
+  background: var(--win-border);
+  margin: 4px 12px;
+}
+
+.hasChildren {
+  position: relative;
+}
+
+.arrow {
+  font-size: 8px;
+  color: var(--win-text-secondary);
+  margin-left: auto;
+  padding-left: 24px;
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+.submenu {
+  position: absolute;
+  left: 100%;
+  top: 0;
+  background: var(--win-bg-context-menu);
+  border: 1px solid var(--win-border);
+  box-shadow: var(--win-shadow-menu);
+  min-width: 200px;
+  padding: 4px 0;
+  z-index: 99999;
+  animation: menuFadeIn 100ms ease forwards;
+}
+
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 99998;
+}

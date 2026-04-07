@@ -1,0 +1,415 @@
+.presentation {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  font-family: var(--win-font);
+  background: radial-gradient(ellipse at 50% 0%, #1e2a4a 0%, #1a1a2e 60%);
+  color: var(--win-text-primary);
+  overflow: hidden;
+  user-select: none;
+}
+
+.slideContainer {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+}
+
+.slide {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 40px 60px;
+  overflow-y: auto;
+  transition: transform 350ms cubic-bezier(0.4, 0, 0.2, 1), opacity 300ms ease;
+}
+
+.slideEnterLeft {
+  transform: translateX(-100%);
+  opacity: 0;
+}
+
+.slideEnterRight {
+  transform: translateX(100%);
+  opacity: 0;
+}
+
+.slideActive {
+  transform: translateX(0);
+  opacity: 1;
+}
+
+/* Slide type styles */
+.accentLine {
+  width: 60px;
+  height: 4px;
+  background: linear-gradient(90deg, var(--win-accent), var(--win-accent-light));
+  margin-bottom: 16px;
+  border-radius: 2px;
+}
+
+.slideTitle {
+  font-size: 36px;
+  font-weight: 700;
+  margin-bottom: 12px;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+}
+
+.slideSubtitle {
+  font-size: 18px;
+  color: var(--win-text-secondary);
+  margin-bottom: 24px;
+  letter-spacing: 0.01em;
+}
+
+.slideDesc {
+  font-size: 15px;
+  color: var(--win-text-secondary);
+  line-height: 1.6;
+  margin-bottom: 20px;
+  max-width: 700px;
+}
+
+/* Terminal mockup */
+.terminalMock {
+  background: #0d1117;
+  border-radius: 10px;
+  overflow: hidden;
+  margin-top: 16px;
+  max-width: 600px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(0, 0, 0, 0.2);
+}
+
+.terminalBar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 14px;
+  background: #161b22;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.terminalDot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+}
+
+.dotRed { background: #ff5f57; }
+.dotYellow { background: #febc2e; }
+.dotGreen { background: #28c840; }
+
+.terminalTitle {
+  flex: 1;
+  text-align: center;
+  font-size: 12px;
+  color: #8b949e;
+}
+
+.terminalBody {
+  padding: 14px 16px;
+  font-family: var(--win-font-mono);
+  font-size: 13px;
+  line-height: 1.7;
+  border-left: 2px solid rgba(88, 166, 255, 0.15);
+}
+
+.terminalPrompt {
+  color: #58a6ff;
+}
+
+.terminalCommand {
+  color: #c9d1d9;
+}
+
+.terminalOutput {
+  color: #8b949e;
+}
+
+/* Numbered list */
+.numberedList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  counter-reset: agenda;
+}
+
+.numberedList li {
+  counter-increment: agenda;
+  padding: 10px 0;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.numberedList li::before {
+  content: counter(agenda);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--win-accent), var(--win-accent-dark));
+  font-size: 13px;
+  font-weight: 600;
+  flex-shrink: 0;
+  box-shadow: 0 2px 8px rgba(0, 120, 212, 0.3);
+}
+
+/* Cards */
+.cardGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.card {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.06) 0%, rgba(255, 255, 255, 0.02) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  padding: 20px;
+  transition: transform 200ms ease, box-shadow 200ms ease, border-color 200ms ease;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+  border-color: rgba(255, 255, 255, 0.14);
+}
+
+.cardTitle {
+  font-size: 15px;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: var(--win-accent-light);
+}
+
+.cardDesc {
+  font-size: 13px;
+  color: var(--win-text-secondary);
+  line-height: 1.5;
+}
+
+/* Steps */
+.steps {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 16px;
+  counter-reset: step;
+}
+
+.steps li {
+  counter-increment: step;
+  padding: 8px 0;
+  font-size: 15px;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.steps li::before {
+  content: counter(step);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--win-accent), var(--win-accent-dark));
+  font-size: 12px;
+  font-weight: 600;
+  flex-shrink: 0;
+  margin-top: 2px;
+  box-shadow: 0 2px 6px rgba(0, 120, 212, 0.25);
+}
+
+/* Checklist */
+.checklist {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.checkItem {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  font-size: 15px;
+  cursor: pointer;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 6px;
+  transition: background 150ms ease;
+}
+
+.checkItem:hover {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.checkbox {
+  width: 20px;
+  height: 20px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all var(--win-transition-fast);
+}
+
+.checkboxChecked {
+  background: var(--win-accent);
+  border-color: var(--win-accent);
+  box-shadow: 0 0 8px rgba(0, 120, 212, 0.3);
+}
+
+.checkmark {
+  color: white;
+  display: block;
+}
+
+/* Resources */
+.resourceList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.resourceList li {
+  padding: 12px 0;
+  font-size: 15px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.resourceLink {
+  color: var(--win-accent-light, #429ce3);
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 150ms ease;
+}
+
+.resourceLink:hover {
+  color: #6bb5f0;
+  text-decoration: underline;
+}
+
+/* Thank you */
+.centerSlide {
+  text-align: center;
+  align-items: center;
+}
+
+.centerSlide .slideTitle {
+  font-size: 48px;
+}
+
+/* Alt text */
+.altText {
+  font-size: 13px;
+  color: var(--win-text-disabled);
+  font-style: italic;
+  margin-top: 8px;
+}
+
+/* Navigation bar */
+.navBar {
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  background: rgba(0, 0, 0, 0.4);
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.progressTrack {
+  width: 100%;
+  height: 3px;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.progressFill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--win-accent), var(--win-accent-light));
+  transition: width 300ms ease;
+  border-radius: 0 2px 2px 0;
+}
+
+.navControls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 10px 16px;
+}
+
+.navBtn {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: var(--win-text-primary);
+  cursor: pointer;
+  border-radius: 8px;
+  font-size: 16px;
+  transition: all var(--win-transition-fast);
+}
+
+.navBtn:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.16);
+  transform: scale(1.05);
+}
+
+.navBtn:active:not(:disabled) {
+  transform: scale(0.95);
+}
+
+.navBtn:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+
+.dots {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.15);
+  cursor: pointer;
+  transition: all 300ms ease;
+}
+
+.dot:hover {
+  background: rgba(255, 255, 255, 0.35);
+}
+
+.dotActive {
+  background: var(--win-accent);
+  width: 24px;
+  box-shadow: 0 0 8px rgba(0, 120, 212, 0.4);
+}
+
+.counter {
+  font-size: 12px;
+  color: var(--win-text-disabled);
+  min-width: 60px;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.05em;
+}

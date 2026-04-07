@@ -1,0 +1,150 @@
+.explorer {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  font-family: var(--win-font);
+  background: var(--win-bg-window);
+  color: var(--win-text-primary);
+}
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  background: var(--win-bg-window);
+  border-bottom: 1px solid var(--win-border);
+  flex-shrink: 0;
+}
+
+.navBtn {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  color: var(--win-text-secondary);
+  cursor: pointer;
+  font-size: 14px;
+  border-radius: var(--win-radius-sm);
+}
+
+.navBtn:hover {
+  background: var(--win-bg-hover);
+  color: var(--win-text-primary);
+}
+
+.navBtn:disabled {
+  color: var(--win-text-disabled);
+  cursor: default;
+}
+
+.navBtn:disabled:hover {
+  background: transparent;
+}
+
+.pathBar {
+  flex: 1;
+  height: 28px;
+  background: var(--win-bg-input);
+  border: 1px solid var(--win-border);
+  color: var(--win-text-primary);
+  padding: 0 8px;
+  font-size: 12px;
+  font-family: var(--win-font);
+  display: flex;
+  align-items: center;
+}
+
+.body {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+.sidebar {
+  width: 200px;
+  background: var(--win-bg-window);
+  border-right: 1px solid var(--win-border);
+  overflow-y: auto;
+  flex-shrink: 0;
+  padding: 4px 0;
+}
+
+.sidebarSection {
+  padding: 4px 0;
+}
+
+.sidebarHeader {
+  padding: 4px 12px;
+  font-size: 11px;
+  color: var(--win-text-secondary);
+  text-transform: uppercase;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+.sidebarItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 12px 4px 20px;
+  font-size: 13px;
+  cursor: pointer;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sidebarItem:hover {
+  background: var(--win-bg-hover);
+}
+
+.sidebarItemActive {
+  background: var(--win-bg-active, rgba(255,255,255,0.08));
+}
+
+.sidebarIcon {
+  font-size: 14px;
+  flex-shrink: 0;
+}
+
+.content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+  gap: 4px;
+}
+
+.fileItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 4px;
+  border-radius: var(--win-radius-sm);
+  cursor: pointer;
+  text-align: center;
+}
+
+.fileItem:hover {
+  background: var(--win-bg-hover);
+}
+
+.fileIcon {
+  font-size: 32px;
+}
+
+.fileName {
+  font-size: 12px;
+  word-break: break-word;
+  line-height: 1.3;
+  max-width: 80px;
+}

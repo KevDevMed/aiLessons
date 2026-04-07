@@ -1,0 +1,84 @@
+.viewer {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: #1a1a1a;
+}
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 12px;
+  background: var(--win-bg-surface);
+  border-bottom: 1px solid var(--win-border);
+}
+
+.fileName {
+  font-size: 12px;
+  color: var(--win-text-primary);
+  font-weight: 600;
+}
+
+.toolbarActions {
+  display: flex;
+  gap: 2px;
+}
+
+.toolBtn {
+  background: transparent;
+  border: none;
+  color: var(--win-text-secondary);
+  font-size: 14px;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+.toolBtn:hover {
+  background: var(--win-hover);
+  color: var(--win-text-primary);
+}
+
+.canvas {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  overflow: hidden;
+}
+
+.mockImage {
+  width: 100%;
+  height: 100%;
+  border-radius: 2px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  position: relative;
+}
+
+.imageLabel {
+  font-size: 16px;
+  color: rgba(255, 255, 255, 0.7);
+  font-weight: 600;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.6);
+  pointer-events: none;
+  user-select: none;
+}
+
+.statusBar {
+  padding: 4px 12px;
+  font-size: 11px;
+  color: var(--win-text-secondary);
+  background: var(--win-bg-surface);
+  border-top: 1px solid var(--win-border);
+}
