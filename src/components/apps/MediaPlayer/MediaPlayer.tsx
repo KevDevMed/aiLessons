@@ -12,6 +12,7 @@ interface TrackInfo {
   type: 'audio' | 'video';
   gradient: string;
   src?: string;
+  youtubeId?: string;
 }
 
 const mockTracks: Record<string, TrackInfo> = {
@@ -77,7 +78,7 @@ const mockTracks: Record<string, TrackInfo> = {
     durationSeconds: 0,
     type: 'video',
     gradient: '',
-    src: '/videos/session-1-recording.mp4',
+    youtubeId: 'UfGtk8WyYwY',
   },
 };
 
@@ -99,6 +100,24 @@ function getDefaultTrack(fileName: string): TrackInfo {
     type: isVideo ? 'video' : 'audio',
     gradient: 'linear-gradient(135deg, #37474f 0%, #455a64 50%, #546e7a 100%)',
   };
+}
+
+// YouTube embed player
+function YouTubePlayer({ track }: { track: TrackInfo }) {
+  return (
+    <div className={styles.player}>
+      <div className={styles.screen}>
+        <iframe
+          className={styles.realVideo}
+          src={`https://www.youtube.com/embed/${track.youtubeId}?rel=0`}
+          title={track.title}
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowFullScreen
+          style={{ border: 'none', width: '100%', height: '100%' }}
+        />
+      </div>
+    </div>
+  );
 }
 
 // Real media player for tracks with a src
@@ -312,6 +331,9 @@ export function MediaPlayer({ windowId }: AppProps) {
   const fileName = (win?.initialData?.fileName as string) || 'video.mp4';
   const track = mockTracks[fileName] || getDefaultTrack(fileName);
 
+  if (track.youtubeId) {
+    return <YouTubePlayer track={track} />;
+  }
   if (track.src) {
     return <RealVideoPlayer track={track} />;
   }
