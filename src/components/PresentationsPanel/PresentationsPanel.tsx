@@ -8,9 +8,33 @@ import {
 import { useAppStore } from '../../stores/useAppStore';
 import { AppProps } from '../../types/app';
 
+type ViewMode = 'icons' | 'list';
+
+const typeLabels: Record<string, string> = {
+  presentation: 'Presentation',
+  document: 'Document',
+  tool: 'Application',
+  link: 'Shortcut',
+};
+
+const sidebarItems = [
+  { label: 'Quick Access', icon: '⭐', action: 'file-explorer' },
+  { label: 'This PC', icon: '💻', action: 'file-explorer', children: [
+    { label: 'Desktop', icon: '🖥️', action: 'file-explorer' },
+    { label: 'Documents', icon: '📄', action: 'file-explorer' },
+    { label: 'Downloads', icon: '⬇️', action: 'file-explorer' },
+    { label: 'Pictures', icon: '🖼️', action: 'file-explorer' },
+    { label: 'Music', icon: '🎵', action: 'file-explorer' },
+    { label: 'Videos', icon: '🎬', action: 'file-explorer' },
+  ]},
+  { label: 'Network', icon: '🌐', action: 'file-explorer' },
+];
+
 export default function PresentationsPanel({ windowId }: AppProps) {
   const [currentFolder, setCurrentFolder] = useState<string | null>(null);
   const [selectedItem, setSelectedItem] = useState<string | null>(null);
+  const [viewMode, setViewMode] = useState<ViewMode>('icons');
+  const launchApp = useAppStore((s) => s.launchApp);
   const clickTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   function handleAction(action: string) {
@@ -70,58 +94,158 @@ export default function PresentationsPanel({ windowId }: AppProps) {
     setSelectedItem(null);
   }, []);
 
+  const handleSidebarClick = useCallback((appId: string) => {
+    launchApp(appId);
+  }, [launchApp]);
+
   const folder = currentFolder
     ? presentationFolders.find((f) => f.id === currentFolder)
     : null;
 
+  const pathText = currentFolder && folder
+    ? `This PC > Lessons > ${folder.name}`
+    : 'This PC > Lessons';
+
   return (
-    <div className={styles.explorer}>
-      {currentFolder && folder ? (
-        <>
-          <div className={styles.toolbar}>
-            <button className={styles.navBtn} onClick={goBack} title="Back">
-              ←
-            </button>
-            <div className={styles.pathBar}>
-              Lessons &gt; {folder.name}
+    <div className={styles.folder}>
+      <div className={styles.toolbar}>
+        <button
+          className={styles.navBtn}
+          disabled={!currentFolder}
+          onClick={goBack}
+          title="Back"
+        >
+          ←
+        </button>
+        <button className={styles.navBtn} disabled title="Forward">→</button>
+        <button
+          className={styles.navBtn}
+          onClick={() => currentFolder ? goBack() : launchApp('file-explorer')}
+          title="Up"
+        >
+          ↑
+        </button>
+        <div className={styles.pathBar}>{pathText}</div>
+        <button
+          className={`${styles.viewToggle} ${viewMode === 'icons' ? styles.viewToggleActive : ''}`}
+          onClick={() => setViewMode('icons')}
+          title="Icon view"
+        >
+          ⊞
+        </button>
+        <button
+          className={`${styles.viewToggle} ${viewMode === 'list' ? styles.viewToggleActive : ''}`}
+          onClick={() => setViewMode('list')}
+          title="List view"
+        >
+          ☰
+        </button>
+      </div>
+      <div className={styles.body}>
+        <div className={styles.sidebar}>
+          {sidebarItems.map((section) => (
+            <div key={section.label} className={styles.sidebarSection}>
+              <div
+                className={styles.sidebarItem}
+                onClick={() => handleSidebarClick(section.action)}
+              >
+                <span className={styles.sidebarIcon}>{section.icon}</span>
+                <span>{section.label}</span>
+              </div>
+              {section.children?.map((child) => (
+                <div
+                  key={child.label}
+                  className={styles.sidebarItem}
+                  onClick={() => handleSidebarClick(child.action)}
+                  style={{ paddingLeft: 32 }}
+                >
+                  <span className={styles.sidebarIcon}>{child.icon}</span>
+                  <span>{child.label}</span>
+                </div>
+              ))}
             </div>
-          </div>
-          <div className={styles.content}>
-            <div className={styles.grid}>
+          ))}
+        </div>
+        {currentFolder && folder ? (
+          viewMode === 'icons' ? (
+            <div className={styles.content}>
+              <div className={styles.grid}>
+                {folder.resources.map((resource) => (
+                  <div
+                    key={resource.name}
+                    className={`${styles.item} ${selectedItem === resource.name ? styles.itemSelected : ''}`}
+                    onClick={() => handleFileClick(resource)}
+                  >
+                    <span className={styles.icon}>{resource.icon}</span>
+                    <span className={styles.name}>{resource.name}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ) : (
+            <div className={styles.contentList}>
+              <div className={styles.listHeader}>
+                <span>Name</span>
+                <span>Type</span>
+                <span>Description</span>
+              </div>
               {folder.resources.map((resource) => (
                 <div
                   key={resource.name}
-                  className={`${styles.fileItem} ${selectedItem === resource.name ? styles.fileItemSelected : ''}`}
+                  className={`${styles.listItem} ${selectedItem === resource.name ? styles.listItemSelected : ''}`}
                   onClick={() => handleFileClick(resource)}
                 >
-                  <span className={styles.fileIcon}>{resource.icon}</span>
-                  <span className={styles.fileName}>{resource.name}</span>
+                  <div className={styles.listItemName}>
+                    <span className={styles.listItemIcon}>{resource.icon}</span>
+                    <span className={styles.listItemText}>{resource.name}</span>
+                  </div>
+                  <span className={styles.listItemMeta}>{typeLabels[resource.type] || resource.type}</span>
+                  <span className={styles.listItemMeta}>{resource.description}</span>
                 </div>
               ))}
             </div>
-          </div>
-        </>
-      ) : (
-        <>
-          <div className={styles.toolbar}>
-            <div className={styles.pathBar}>Lessons</div>
-          </div>
-          <div className={styles.content}>
-            <div className={styles.grid}>
+          )
+        ) : (
+          viewMode === 'icons' ? (
+            <div className={styles.content}>
+              <div className={styles.grid}>
+                {presentationFolders.map((f) => (
+                  <div
+                    key={f.id}
+                    className={`${styles.item} ${selectedItem === f.id ? styles.itemSelected : ''}`}
+                    onClick={() => handleFolderClick(f.id)}
+                  >
+                    <span className={styles.icon}>📁</span>
+                    <span className={styles.name}>{f.name}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ) : (
+            <div className={styles.contentList}>
+              <div className={styles.listHeader}>
+                <span>Name</span>
+                <span>Type</span>
+                <span>Items</span>
+              </div>
               {presentationFolders.map((f) => (
                 <div
                   key={f.id}
-                  className={`${styles.fileItem} ${selectedItem === f.id ? styles.fileItemSelected : ''}`}
+                  className={`${styles.listItem} ${selectedItem === f.id ? styles.listItemSelected : ''}`}
                   onClick={() => handleFolderClick(f.id)}
                 >
-                  <span className={styles.fileIcon}>📁</span>
-                  <span className={styles.fileName}>{f.name}</span>
+                  <div className={styles.listItemName}>
+                    <span className={styles.listItemIcon}>📁</span>
+                    <span className={styles.listItemText}>{f.name}</span>
+                  </div>
+                  <span className={styles.listItemMeta}>File folder</span>
+                  <span className={styles.listItemMeta}>{f.resources.length} items</span>
                 </div>
               ))}
             </div>
-          </div>
-        </>
-      )}
+          )
+        )}
+      </div>
     </div>
   );
 }
