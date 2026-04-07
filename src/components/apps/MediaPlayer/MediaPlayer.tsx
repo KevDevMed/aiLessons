@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useRef, useCallback, useEffect } from 'react';
 import { AppProps } from '../../../types/app';
 import { useWindowStore } from '../../../stores/useWindowStore';
 import styles from './MediaPlayer.module.css';
@@ -11,6 +11,7 @@ interface TrackInfo {
   durationSeconds: number;
   type: 'audio' | 'video';
   gradient: string;
+  src?: string;
 }
 
 const mockTracks: Record<string, TrackInfo> = {
@@ -72,10 +73,11 @@ const mockTracks: Record<string, TrackInfo> = {
     title: 'Herramientas - AI: Setup de agentes y herramientas',
     artist: '',
     album: 'Session 1',
-    duration: '45:00',
-    durationSeconds: 2700,
+    duration: '',
+    durationSeconds: 0,
     type: 'video',
     gradient: '',
+    src: '/videos/session-1-recording.mp4',
   },
 };
 
@@ -99,12 +101,108 @@ function getDefaultTrack(fileName: string): TrackInfo {
   };
 }
 
-export function MediaPlayer({ windowId }: AppProps) {
-  const win = useWindowStore((s) => s.windows[windowId]);
-  const fileName = (win?.initialData?.fileName as string) || 'video.mp4';
-  const track = mockTracks[fileName] || getDefaultTrack(fileName);
-  const isAudio = track.type === 'audio';
+// Real media player for tracks with a src
+function RealVideoPlayer({ track }: { track: TrackInfo }) {
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const [playing, setPlaying] = useState(false);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [duration, setDuration] = useState(0);
+  const [volume, setVolume] = useState(75);
+  const [muted, setMuted] = useState(false);
 
+  useEffect(() => {
+    const v = videoRef.current;
+    if (!v) return;
+    v.volume = volume / 100;
+    v.muted = muted;
+  }, [volume, muted]);
+
+  const togglePlay = useCallback(() => {
+    const v = videoRef.current;
+    if (!v) return;
+    if (v.paused) {
+      v.play();
+      setPlaying(true);
+    } else {
+      v.pause();
+      setPlaying(false);
+    }
+  }, []);
+
+  const handleProgressClick = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+    const v = videoRef.current;
+    if (!v || !duration) return;
+    const rect = e.currentTarget.getBoundingClientRect();
+    const pct = (e.clientX - rect.left) / rect.width;
+    v.currentTime = pct * duration;
+  }, [duration]);
+
+  const progress = duration > 0 ? (currentTime / duration) * 100 : 0;
+
+  return (
+    <div className={styles.player}>
+      <div className={styles.screen} onClick={togglePlay} style={{ cursor: 'pointer' }}>
+        <video
+          ref={videoRef}
+          className={styles.realVideo}
+          src={track.src}
+          onTimeUpdate={() => setCurrentTime(videoRef.current?.currentTime ?? 0)}
+          onLoadedMetadata={() => setDuration(videoRef.current?.duration ?? 0)}
+          onEnded={() => setPlaying(false)}
+          onPlay={() => setPlaying(true)}
+          onPause={() => setPlaying(false)}
+        />
+      </div>
+
+      <div className={styles.controls}>
+        <div className={styles.progressBar} onClick={handleProgressClick}>
+          <div className={styles.progress} style={{ width: `${progress}%` }} />
+          <div className={styles.progressThumb} style={{ left: `${progress}%` }} />
+        </div>
+
+        <div className={styles.buttons}>
+          <button className={styles.controlBtn} title="Previous">⏮</button>
+          <button
+            className={`${styles.controlBtn} ${styles.playBtn}`}
+            onClick={togglePlay}
+          >
+            {playing ? '⏸' : '▶'}
+          </button>
+          <button className={styles.controlBtn} title="Next">⏭</button>
+
+          <span className={styles.time}>
+            {formatTime(currentTime)} / {formatTime(duration)}
+          </span>
+
+          <div className={styles.volumeControl}>
+            <button
+              className={styles.controlBtn}
+              onClick={() => setMuted(!muted)}
+              title={muted ? 'Unmute' : 'Mute'}
+            >
+              {muted || volume === 0 ? '🔇' : volume < 50 ? '🔉' : '🔊'}
+            </button>
+            <input
+              type="range"
+              className={styles.volumeSlider}
+              min={0}
+              max={100}
+              value={muted ? 0 : volume}
+              onChange={(e) => {
+                setVolume(Number(e.target.value));
+                if (muted) setMuted(false);
+              }}
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Mock player for demo tracks without a real src
+function MockPlayer({ track }: { track: TrackInfo }) {
+  const isAudio = track.type === 'audio';
   const [playing, setPlaying] = useState(false);
   const [progress, setProgress] = useState(0);
   const [volume, setVolume] = useState(75);
@@ -207,4 +305,15 @@ export function MediaPlayer({ windowId }: AppProps) {
       </div>
     </div>
   );
+}
+
+export function MediaPlayer({ windowId }: AppProps) {
+  const win = useWindowStore((s) => s.windows[windowId]);
+  const fileName = (win?.initialData?.fileName as string) || 'video.mp4';
+  const track = mockTracks[fileName] || getDefaultTrack(fileName);
+
+  if (track.src) {
+    return <RealVideoPlayer track={track} />;
+  }
+  return <MockPlayer track={track} />;
 }

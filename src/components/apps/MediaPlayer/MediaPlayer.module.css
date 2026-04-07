@@ -14,6 +14,14 @@
   overflow: hidden;
 }
 
+/* Real video */
+.realVideo {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  background: #000;
+}
+
 /* Audio mode */
 .audioView {
   display: flex;
