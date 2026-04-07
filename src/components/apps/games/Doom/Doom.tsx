@@ -1,5 +1,5 @@
 import { useRef, useEffect, useCallback, useState } from 'react';
-import { AppProps } from '../../../types/app';
+import { AppProps } from '../../../../types/app';
 import styles from './Doom.module.css';
 
 // ============================================================

@@ -1,5 +1,5 @@
 import { useRef, useEffect, useCallback, useState } from 'react';
-import { AppProps } from '../../../types/app';
+import { AppProps } from '../../../../types/app';
 import styles from './Snake.module.css';
 
 type Direction = 'UP' | 'DOWN' | 'LEFT' | 'RIGHT';

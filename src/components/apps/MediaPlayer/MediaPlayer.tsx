@@ -68,6 +68,15 @@ const mockTracks: Record<string, TrackInfo> = {
     type: 'video',
     gradient: '',
   },
+  'session-1-recording': {
+    title: 'Herramientas - AI: Setup de agentes y herramientas',
+    artist: '',
+    album: 'Session 1',
+    duration: '45:00',
+    durationSeconds: 2700,
+    type: 'video',
+    gradient: '',
+  },
 };
 
 function formatTime(seconds: number): string {

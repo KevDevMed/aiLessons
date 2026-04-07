@@ -9,6 +9,7 @@ import { Snake } from '../components/apps/games/Snake/Snake';
 import { Tetris } from '../components/apps/games/Tetris/Tetris';
 import { BrickBreaker } from '../components/apps/games/BrickBreaker/BrickBreaker';
 import { Doom } from '../components/apps/games/Doom/Doom';
+import { GamesFolder } from '../components/apps/GamesFolder/GamesFolder';
 import { Spreadsheet } from '../components/apps/Spreadsheet/Spreadsheet';
 import { ImageViewer } from '../components/apps/ImageViewer/ImageViewer';
 import { MediaPlayer } from '../components/apps/MediaPlayer/MediaPlayer';
@@ -134,6 +135,18 @@ export const APP_REGISTRY: Record<string, AppDefinition> = {
     minHeight: 480,
     singleton: true,
     tileSize: 'medium',
+  },
+  'games': {
+    id: 'games',
+    name: 'Games',
+    icon: '📁',
+    component: GamesFolder,
+    defaultWidth: 400,
+    defaultHeight: 350,
+    minWidth: 300,
+    minHeight: 250,
+    singleton: true,
+    tileSize: 'small',
   },
   'spreadsheet': {
     id: 'spreadsheet',

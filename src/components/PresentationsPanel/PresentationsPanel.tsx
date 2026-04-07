@@ -21,6 +21,9 @@ export default function PresentationsPanel({ windowId }: AppProps) {
       const contentKey = action.replace('open-notepad:', '');
       const content = presentationDocuments[contentKey] || '';
       appStore.launchApp('notepad', { content });
+    } else if (action.startsWith('open-media:')) {
+      const fileName = action.replace('open-media:', '');
+      appStore.launchApp('media-player', { fileName });
     } else if (action.startsWith('launch:')) {
       const appId = action.replace('launch:', '');
       appStore.launchApp(appId);
