@@ -13,6 +13,7 @@ interface TrackInfo {
   gradient: string;
   src?: string;
   youtubeId?: string;
+  spotifyId?: string;
 }
 
 const mockTracks: Record<string, TrackInfo> = {
@@ -24,6 +25,7 @@ const mockTracks: Record<string, TrackInfo> = {
     durationSeconds: 355,
     type: 'audio',
     gradient: 'linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%)',
+    spotifyId: '4u7EnebtmKWzUH433cf5Qv',
   },
   'Hotel California.mp3': {
     title: 'Hotel California',
@@ -33,6 +35,7 @@ const mockTracks: Record<string, TrackInfo> = {
     durationSeconds: 390,
     type: 'audio',
     gradient: 'linear-gradient(135deg, #e65100 0%, #bf360c 50%, #4e342e 100%)',
+    spotifyId: '40riOy7x9W7GXjyGp4pjAv',
   },
   'Stairway to Heaven.flac': {
     title: 'Stairway to Heaven',
@@ -42,6 +45,7 @@ const mockTracks: Record<string, TrackInfo> = {
     durationSeconds: 482,
     type: 'audio',
     gradient: 'linear-gradient(135deg, #1b5e20 0%, #2e7d32 50%, #4caf50 100%)',
+    spotifyId: '5CQ30WqJwcep0pYcV4AMNc',
   },
   'Take On Me.wav': {
     title: 'Take On Me',
@@ -51,6 +55,7 @@ const mockTracks: Record<string, TrackInfo> = {
     durationSeconds: 228,
     type: 'audio',
     gradient: 'linear-gradient(135deg, #4a148c 0%, #7b1fa2 50%, #ce93d8 100%)',
+    spotifyId: '2WfaOiMkCvy7F5fcp2zZ8L',
   },
   'tutorial.mp4': {
     title: 'Getting Started Tutorial',
@@ -60,6 +65,7 @@ const mockTracks: Record<string, TrackInfo> = {
     durationSeconds: 754,
     type: 'video',
     gradient: '',
+    youtubeId: 'dQw4w9WgXcQ',
   },
   'screen-recording.mp4': {
     title: 'Screen Recording',
@@ -69,6 +75,7 @@ const mockTracks: Record<string, TrackInfo> = {
     durationSeconds: 208,
     type: 'video',
     gradient: '',
+    youtubeId: 'dQw4w9WgXcQ',
   },
   'session-1-recording': {
     title: 'Herramientas - AI: Setup de agentes y herramientas',
@@ -79,6 +86,16 @@ const mockTracks: Record<string, TrackInfo> = {
     type: 'video',
     gradient: '',
     youtubeId: 'UfGtk8WyYwY',
+  },
+  'session-2-recording': {
+    title: 'Modelos de AI y Tracking Killer Demo',
+    artist: '',
+    album: 'Session 2',
+    duration: '',
+    durationSeconds: 0,
+    type: 'video',
+    gradient: '',
+    youtubeId: 'wDMaJOzD_fA',
   },
 };
 
@@ -102,6 +119,23 @@ function getDefaultTrack(fileName: string): TrackInfo {
   };
 }
 
+// Spotify embed player
+function SpotifyPlayer({ track }: { track: TrackInfo }) {
+  return (
+    <div className={styles.player}>
+      <div className={styles.spotifyEmbed}>
+        <iframe
+          src={`https://open.spotify.com/embed/track/${track.spotifyId}?theme=0`}
+          title={track.title}
+          allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+          loading="lazy"
+          style={{ border: 'none', width: '100%', height: '100%', borderRadius: '12px' }}
+        />
+      </div>
+    </div>
+  );
+}
+
 // YouTube embed player
 function YouTubePlayer({ track }: { track: TrackInfo }) {
   return (
@@ -109,7 +143,7 @@ function YouTubePlayer({ track }: { track: TrackInfo }) {
       <div className={styles.screen}>
         <iframe
           className={styles.realVideo}
-          src={`https://www.youtube.com/embed/${track.youtubeId}?rel=0`}
+          src={`https://www.youtube.com/embed/${track.youtubeId}?rel=0&autoplay=1`}
           title={track.title}
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
           allowFullScreen
@@ -331,6 +365,9 @@ export function MediaPlayer({ windowId }: AppProps) {
   const fileName = (win?.initialData?.fileName as string) || 'video.mp4';
   const track = mockTracks[fileName] || getDefaultTrack(fileName);
 
+  if (track.spotifyId) {
+    return <SpotifyPlayer track={track} />;
+  }
   if (track.youtubeId) {
     return <YouTubePlayer track={track} />;
   }

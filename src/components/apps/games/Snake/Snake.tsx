@@ -10,6 +10,102 @@ const GRID_SIZE = 20;
 const BASE_SPEED = 150;
 const MIN_SPEED = 60;
 
+// ============================================================
+// SOUND ENGINE (Web Audio API - procedural)
+// ============================================================
+
+class SnakeSoundEngine {
+  private ctx: AudioContext | null = null;
+  private masterGain: GainNode | null = null;
+
+  private ensureCtx(): AudioContext {
+    if (!this.ctx) {
+      this.ctx = new AudioContext();
+      this.masterGain = this.ctx.createGain();
+      this.masterGain.gain.value = 0.3;
+      this.masterGain.connect(this.ctx.destination);
+    }
+    if (this.ctx.state === 'suspended') this.ctx.resume();
+    return this.ctx;
+  }
+
+  private getMaster(): GainNode {
+    this.ensureCtx();
+    return this.masterGain!;
+  }
+
+  playEat() {
+    try {
+      const ctx = this.ensureCtx();
+      const now = ctx.currentTime;
+      const master = this.getMaster();
+
+      // Quick ascending two-tone "blip"
+      const osc1 = ctx.createOscillator();
+      const g1 = ctx.createGain();
+      osc1.type = 'sine';
+      osc1.frequency.value = 440;
+      g1.gain.setValueAtTime(0.25, now);
+      g1.gain.exponentialRampToValueAtTime(0.01, now + 0.06);
+      osc1.connect(g1);
+      g1.connect(master);
+      osc1.start(now);
+      osc1.stop(now + 0.08);
+
+      const osc2 = ctx.createOscillator();
+      const g2 = ctx.createGain();
+      osc2.type = 'sine';
+      osc2.frequency.value = 660;
+      g2.gain.setValueAtTime(0.25, now + 0.06);
+      g2.gain.exponentialRampToValueAtTime(0.01, now + 0.12);
+      osc2.connect(g2);
+      g2.connect(master);
+      osc2.start(now + 0.06);
+      osc2.stop(now + 0.14);
+    } catch {}
+  }
+
+  playGameOver() {
+    try {
+      const ctx = this.ensureCtx();
+      const now = ctx.currentTime;
+      const master = this.getMaster();
+
+      // Descending sawtooth
+      const osc = ctx.createOscillator();
+      const g = ctx.createGain();
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(400, now);
+      osc.frequency.exponentialRampToValueAtTime(80, now + 0.4);
+      g.gain.setValueAtTime(0.2, now);
+      g.gain.exponentialRampToValueAtTime(0.01, now + 0.5);
+      osc.connect(g);
+      g.connect(master);
+      osc.start(now);
+      osc.stop(now + 0.55);
+
+      // Low rumble
+      const osc2 = ctx.createOscillator();
+      const g2 = ctx.createGain();
+      osc2.type = 'square';
+      osc2.frequency.value = 55;
+      g2.gain.setValueAtTime(0.15, now);
+      g2.gain.exponentialRampToValueAtTime(0.01, now + 0.4);
+      osc2.connect(g2);
+      g2.connect(master);
+      osc2.start(now);
+      osc2.stop(now + 0.45);
+    } catch {}
+  }
+
+  cleanup() {
+    if (this.ctx) {
+      try { this.ctx.close(); } catch {}
+      this.ctx = null;
+    }
+  }
+}
+
 export function Snake({ windowId }: AppProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const wrapperRef = useRef<HTMLDivElement>(null);
@@ -22,6 +118,7 @@ export function Snake({ windowId }: AppProps) {
   const statusRef = useRef<GameStatus>('idle');
   const intervalRef = useRef<number | null>(null);
   const scoreRef = useRef(0);
+  const soundRef = useRef(new SnakeSoundEngine());
 
   const [score, setScore] = useState(0);
   const [gameStatus, setGameStatus] = useState<GameStatus>('idle');
@@ -123,6 +220,7 @@ export function Snake({ windowId }: AppProps) {
     if (newHead.x < 0 || newHead.x >= GRID_SIZE || newHead.y < 0 || newHead.y >= GRID_SIZE) {
       statusRef.current = 'over';
       setGameStatus('over');
+      soundRef.current.playGameOver();
       if (intervalRef.current !== null) {
         clearInterval(intervalRef.current);
         intervalRef.current = null;
@@ -135,6 +233,7 @@ export function Snake({ windowId }: AppProps) {
     if (snake.some(s => s.x === newHead.x && s.y === newHead.y)) {
       statusRef.current = 'over';
       setGameStatus('over');
+      soundRef.current.playGameOver();
       if (intervalRef.current !== null) {
         clearInterval(intervalRef.current);
         intervalRef.current = null;
@@ -150,6 +249,7 @@ export function Snake({ windowId }: AppProps) {
     } else {
       scoreRef.current += 10;
       setScore(scoreRef.current);
+      soundRef.current.playEat();
       spawnFood();
 
       // Restart interval with increased speed
@@ -243,12 +343,14 @@ export function Snake({ windowId }: AppProps) {
     draw();
   }, [canvasSize, draw]);
 
-  // Cleanup interval on unmount
+  // Cleanup interval and sound on unmount
   useEffect(() => {
+    const sound = soundRef.current;
     return () => {
       if (intervalRef.current !== null) {
         clearInterval(intervalRef.current);
       }
+      sound.cleanup();
     };
   }, []);
 

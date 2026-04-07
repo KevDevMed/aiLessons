@@ -13,6 +13,7 @@ interface DesktopIconProps {
   onSelect: () => void;
   onLaunch: () => void;
   onDragEnd: (x: number, y: number) => void;
+  onContextMenu?: (e: React.MouseEvent) => void;
 }
 
 export default function DesktopIcon({
@@ -24,6 +25,7 @@ export default function DesktopIcon({
   onSelect,
   onLaunch,
   onDragEnd,
+  onContextMenu,
 }: DesktopIconProps) {
   const clickTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const dragState = useRef<{
@@ -104,6 +106,7 @@ export default function DesktopIcon({
         top: displayPos.y,
       }}
       onMouseDown={handleMouseDown}
+      onContextMenu={onContextMenu}
     >
       <div className={styles.iconImage}>{icon}</div>
       <span className={styles.label}>{label}</span>

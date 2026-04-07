@@ -36,12 +36,15 @@
 
 .startButton {
   width: 48px;
-  height: 40px;
+  height: var(--win-taskbar-height);
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   transition: background var(--win-transition-fast);
+  border: none;
+  background: transparent;
+  padding: 0;
 }
 
 .startButton:hover {
@@ -53,6 +56,13 @@
 }
 
 .startButtonSvg {
-  width: 18px;
-  height: 18px;
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+  filter: brightness(1);
+  transition: filter var(--win-transition-fast);
+}
+
+.startButton:hover .startButtonSvg {
+  filter: brightness(1.2);
 }

@@ -22,6 +22,16 @@
   background: #000;
 }
 
+/* Spotify embed */
+.spotifyEmbed {
+  flex: 1;
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  padding: 12px;
+  background: #0a0a0a;
+}
+
 /* Audio mode */
 .audioView {
   display: flex;

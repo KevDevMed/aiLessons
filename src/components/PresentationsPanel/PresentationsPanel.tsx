@@ -17,6 +17,8 @@ export default function PresentationsPanel({ windowId }: AppProps) {
     const appStore = useAppStore.getState();
     if (action === 'launch:presentation') {
       appStore.launchApp('presentation');
+    } else if (action === 'launch:presentation2') {
+      appStore.launchApp('presentation2');
     } else if (action.startsWith('open-notepad:')) {
       const contentKey = action.replace('open-notepad:', '');
       const content = presentationDocuments[contentKey] || '';

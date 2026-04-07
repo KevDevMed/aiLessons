@@ -39,6 +39,172 @@ const PADDLE_BOTTOM_MARGIN = 30;
 
 const ROW_COLORS = ['#e74c3c', '#e67e22', '#f1c40f', '#2ecc71', '#3498db'];
 
+// ============================================================
+// SOUND ENGINE (Web Audio API - procedural)
+// ============================================================
+
+class BrickSoundEngine {
+  private ctx: AudioContext | null = null;
+  private masterGain: GainNode | null = null;
+
+  private ensureCtx(): AudioContext {
+    if (!this.ctx) {
+      this.ctx = new AudioContext();
+      this.masterGain = this.ctx.createGain();
+      this.masterGain.gain.value = 0.3;
+      this.masterGain.connect(this.ctx.destination);
+    }
+    if (this.ctx.state === 'suspended') this.ctx.resume();
+    return this.ctx;
+  }
+
+  private getMaster(): GainNode {
+    this.ensureCtx();
+    return this.masterGain!;
+  }
+
+  playPaddleHit() {
+    try {
+      const ctx = this.ensureCtx();
+      const now = ctx.currentTime;
+      const master = this.getMaster();
+
+      const osc = ctx.createOscillator();
+      const g = ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(250, now);
+      osc.frequency.exponentialRampToValueAtTime(180, now + 0.04);
+      g.gain.setValueAtTime(0.2, now);
+      g.gain.exponentialRampToValueAtTime(0.01, now + 0.06);
+      osc.connect(g);
+      g.connect(master);
+      osc.start(now);
+      osc.stop(now + 0.08);
+    } catch {}
+  }
+
+  playBrickHit() {
+    try {
+      const ctx = this.ensureCtx();
+      const now = ctx.currentTime;
+      const master = this.getMaster();
+
+      // Bright pop
+      const osc = ctx.createOscillator();
+      const g = ctx.createGain();
+      osc.type = 'square';
+      osc.frequency.setValueAtTime(500 + Math.random() * 200, now);
+      osc.frequency.exponentialRampToValueAtTime(200, now + 0.04);
+      g.gain.setValueAtTime(0.15, now);
+      g.gain.exponentialRampToValueAtTime(0.01, now + 0.05);
+      osc.connect(g);
+      g.connect(master);
+      osc.start(now);
+      osc.stop(now + 0.06);
+    } catch {}
+  }
+
+  playWallHit() {
+    try {
+      const ctx = this.ensureCtx();
+      const now = ctx.currentTime;
+      const master = this.getMaster();
+
+      const osc = ctx.createOscillator();
+      const g = ctx.createGain();
+      osc.type = 'triangle';
+      osc.frequency.value = 150;
+      g.gain.setValueAtTime(0.08, now);
+      g.gain.exponentialRampToValueAtTime(0.01, now + 0.03);
+      osc.connect(g);
+      g.connect(master);
+      osc.start(now);
+      osc.stop(now + 0.04);
+    } catch {}
+  }
+
+  playLoseLife() {
+    try {
+      const ctx = this.ensureCtx();
+      const now = ctx.currentTime;
+      const master = this.getMaster();
+
+      const osc = ctx.createOscillator();
+      const g = ctx.createGain();
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(300, now);
+      osc.frequency.exponentialRampToValueAtTime(100, now + 0.3);
+      g.gain.setValueAtTime(0.2, now);
+      g.gain.exponentialRampToValueAtTime(0.01, now + 0.35);
+      osc.connect(g);
+      g.connect(master);
+      osc.start(now);
+      osc.stop(now + 0.4);
+    } catch {}
+  }
+
+  playGameOver() {
+    try {
+      const ctx = this.ensureCtx();
+      const now = ctx.currentTime;
+      const master = this.getMaster();
+
+      const osc = ctx.createOscillator();
+      const g = ctx.createGain();
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(350, now);
+      osc.frequency.exponentialRampToValueAtTime(50, now + 0.5);
+      g.gain.setValueAtTime(0.2, now);
+      g.gain.exponentialRampToValueAtTime(0.01, now + 0.6);
+      osc.connect(g);
+      g.connect(master);
+      osc.start(now);
+      osc.stop(now + 0.65);
+
+      const osc2 = ctx.createOscillator();
+      const g2 = ctx.createGain();
+      osc2.type = 'square';
+      osc2.frequency.value = 45;
+      g2.gain.setValueAtTime(0.15, now + 0.1);
+      g2.gain.exponentialRampToValueAtTime(0.01, now + 0.5);
+      osc2.connect(g2);
+      g2.connect(master);
+      osc2.start(now + 0.1);
+      osc2.stop(now + 0.55);
+    } catch {}
+  }
+
+  playLevelComplete() {
+    try {
+      const ctx = this.ensureCtx();
+      const now = ctx.currentTime;
+      const master = this.getMaster();
+
+      const freqs = [330, 440, 550, 660, 880];
+      freqs.forEach((f, i) => {
+        const osc = ctx.createOscillator();
+        const g = ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.value = f;
+        const t = now + i * 0.07;
+        g.gain.setValueAtTime(0.2, t);
+        g.gain.exponentialRampToValueAtTime(0.01, t + 0.1);
+        osc.connect(g);
+        g.connect(master);
+        osc.start(t);
+        osc.stop(t + 0.12);
+      });
+    } catch {}
+  }
+
+  cleanup() {
+    if (this.ctx) {
+      try { this.ctx.close(); } catch {}
+      this.ctx = null;
+    }
+  }
+}
+
 function createBricks(canvasW: number): Brick[] {
   const bricks: Brick[] = [];
   const brickW = (canvasW - BRICK_PAD * (COLS + 1)) / COLS;
@@ -82,6 +248,7 @@ export function BrickBreaker({ windowId }: AppProps) {
   const gameRef = useRef<GameState>(initState(480, 560));
   const rafRef = useRef<number>(0);
   const keysRef = useRef<Set<string>>(new Set());
+  const soundRef = useRef(new BrickSoundEngine());
 
   const [score, setScore] = useState(0);
   const [lives, setLives] = useState(3);
@@ -219,15 +386,18 @@ export function BrickBreaker({ windowId }: AppProps) {
     if (g.ballX - BALL_RADIUS <= 0) {
       g.ballX = BALL_RADIUS;
       g.ballDX = Math.abs(g.ballDX);
+      soundRef.current.playWallHit();
     } else if (g.ballX + BALL_RADIUS >= W) {
       g.ballX = W - BALL_RADIUS;
       g.ballDX = -Math.abs(g.ballDX);
+      soundRef.current.playWallHit();
     }
 
     // Top wall
     if (g.ballY - BALL_RADIUS <= 0) {
       g.ballY = BALL_RADIUS;
       g.ballDY = Math.abs(g.ballDY);
+      soundRef.current.playWallHit();
     }
 
     // Paddle collision
@@ -250,6 +420,7 @@ export function BrickBreaker({ windowId }: AppProps) {
       const angle = -Math.PI / 2 + hitPos * (Math.PI / 4);
       g.ballDX = Math.cos(angle) * speed;
       g.ballDY = Math.sin(angle) * speed;
+      soundRef.current.playPaddleHit();
     }
 
     // Ball fell below paddle
@@ -259,9 +430,11 @@ export function BrickBreaker({ windowId }: AppProps) {
       if (g.lives <= 0) {
         g.status = 'over';
         setGameStatus('over');
+        soundRef.current.playGameOver();
         draw();
         return;
       }
+      soundRef.current.playLoseLife();
       resetBall();
       draw();
       return;
@@ -281,6 +454,7 @@ export function BrickBreaker({ windowId }: AppProps) {
         brick.alive = false;
         g.score += 10;
         setScore(g.score);
+        soundRef.current.playBrickHit();
 
         // Determine bounce direction
         const overlapLeft = g.ballX + BALL_RADIUS - brick.x;
@@ -303,6 +477,7 @@ export function BrickBreaker({ windowId }: AppProps) {
     if (g.bricks.every(b => !b.alive)) {
       g.score += 50; // level bonus
       setScore(g.score);
+      soundRef.current.playLevelComplete();
       nextLevel();
     }
 
@@ -427,6 +602,12 @@ export function BrickBreaker({ windowId }: AppProps) {
     }
     draw();
   }, [canvasSize, draw]);
+
+  // Cleanup sound on unmount
+  useEffect(() => {
+    const sound = soundRef.current;
+    return () => sound.cleanup();
+  }, []);
 
   // Auto-focus
   useEffect(() => {

@@ -3,6 +3,7 @@ import { useAppStore } from '../../stores/useAppStore';
 import { useMenuStore } from '../../stores/useMenuStore';
 import { useStartMenuStore } from '../../stores/useStartMenuStore';
 import { useDesktopStore, IconSize } from '../../stores/useDesktopStore';
+import { useTrashStore } from '../../stores/useTrashStore';
 import DesktopIcon from './DesktopIcon';
 import styles from './Desktop.module.css';
 
@@ -36,11 +37,13 @@ export default function Desktop() {
   const setSortBy = useDesktopStore((s) => s.setSortBy);
   const iconPositions = useDesktopStore((s) => s.iconPositions);
   const setIconPosition = useDesktopStore((s) => s.setIconPosition);
+  const addTrashItem = useTrashStore((s) => s.addItem);
   const [selectedAppId, setSelectedAppId] = useState<string | null>(null);
+  const [deletedAppIds, setDeletedAppIds] = useState<string[]>([]);
 
   const desktopApps = useMemo(() => {
-    const hiddenIds = ['presentation', 'spreadsheet', 'image-viewer', 'media-player', 'snake', 'tetris', 'brick-breaker', 'doom'];
-    const apps = Object.values(registry).filter((a) => !hiddenIds.includes(a.id));
+    const hiddenIds = ['presentation', 'presentation2', 'spreadsheet', 'image-viewer', 'media-player', 'snake', 'tetris', 'brick-breaker', 'doom', 'flappy-bird'];
+    const apps = Object.values(registry).filter((a) => !hiddenIds.includes(a.id) && !deletedAppIds.includes(a.id));
     switch (sortBy) {
       case 'name':
         return apps.sort((a, b) => a.name.localeCompare(b.name));
@@ -53,7 +56,57 @@ export default function Desktop() {
       default:
         return apps;
     }
-  }, [registry, sortBy]);
+  }, [registry, sortBy, deletedAppIds]);
+
+  const handleIconContextMenu = useCallback(
+    (e: React.MouseEvent, appId: string, appName: string, appIcon: string) => {
+      e.preventDefault();
+      e.stopPropagation();
+      setSelectedAppId(appId);
+      const isRecycleBin = appId === 'recycle-bin';
+      const menuItems = [
+        {
+          id: 'open',
+          label: 'Open',
+          icon: '',
+          action: () => launchApp(appId),
+        },
+        { id: 'div-icon-1', label: '', divider: true },
+      ];
+      if (isRecycleBin) {
+        menuItems.push({
+          id: 'empty-trash',
+          label: 'Empty Recycle Bin',
+          icon: '',
+          action: () => useTrashStore.getState().emptyTrash(),
+        });
+      } else {
+        menuItems.push({
+          id: 'delete',
+          label: 'Delete',
+          icon: '',
+          action: () => {
+            const now = new Date();
+            const dateStr = `${now.getMonth() + 1}/${now.getDate()}/${now.getFullYear()} ${now.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}`;
+            addTrashItem({
+              id: `trash-app-${appId}-${Date.now()}`,
+              name: appName,
+              icon: appIcon,
+              type: 'app',
+              deletedAt: dateStr,
+              originalLocation: 'Desktop',
+              size: '—',
+              appId,
+            });
+            setDeletedAppIds((prev) => [...prev, appId]);
+            setSelectedAppId(null);
+          },
+        });
+      }
+      showMenu(e.clientX, e.clientY, menuItems);
+    },
+    [launchApp, showMenu, addTrashItem]
+  );
 
   const handleContextMenu = useCallback(
     (e: React.MouseEvent) => {
@@ -130,6 +183,7 @@ export default function Desktop() {
                 setSelectedAppId(null);
               }}
               onDragEnd={(x, y) => setIconPosition(app.id, x, y)}
+              onContextMenu={(e) => handleIconContextMenu(e, app.id, app.name, app.icon)}
             />
           );
         })}

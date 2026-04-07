@@ -4,16 +4,19 @@ import { Calculator } from '../components/apps/Calculator/Calculator';
 import { FileExplorer } from '../components/apps/FileExplorer/FileExplorer';
 import { Settings } from '../components/apps/Settings/Settings';
 import { PresentationApp } from '../components/apps/Presentation/PresentationApp';
+import { Presentation2App } from '../components/apps/Presentation2/Presentation2App';
 import { Terminal } from '../components/apps/Terminal/Terminal';
 import { Snake } from '../components/apps/games/Snake/Snake';
 import { Tetris } from '../components/apps/games/Tetris/Tetris';
 import { BrickBreaker } from '../components/apps/games/BrickBreaker/BrickBreaker';
 import { Doom } from '../components/apps/games/Doom/Doom';
+import { FlappyBird } from '../components/apps/games/FlappyBird/FlappyBird';
 import { GamesFolder } from '../components/apps/GamesFolder/GamesFolder';
 import { Spreadsheet } from '../components/apps/Spreadsheet/Spreadsheet';
 import { ImageViewer } from '../components/apps/ImageViewer/ImageViewer';
 import { MediaPlayer } from '../components/apps/MediaPlayer/MediaPlayer';
 import PresentationsPanel from '../components/PresentationsPanel/PresentationsPanel';
+import { RecycleBin } from '../components/apps/RecycleBin/RecycleBin';
 
 export const APP_REGISTRY: Record<string, AppDefinition> = {
   'file-explorer': {
@@ -67,8 +70,20 @@ export const APP_REGISTRY: Record<string, AppDefinition> = {
   'presentation': {
     id: 'presentation',
     name: 'AI Tools Setup',
-    icon: '📽️',
+    icon: '🧠',
     component: PresentationApp,
+    defaultWidth: 960,
+    defaultHeight: 640,
+    minWidth: 500,
+    minHeight: 380,
+    singleton: true,
+    tileSize: 'wide',
+  },
+  'presentation2': {
+    id: 'presentation2',
+    name: 'AI Models & Tracking',
+    icon: '🧠',
+    component: Presentation2App,
     defaultWidth: 960,
     defaultHeight: 640,
     minWidth: 500,
@@ -136,17 +151,29 @@ export const APP_REGISTRY: Record<string, AppDefinition> = {
     singleton: true,
     tileSize: 'medium',
   },
+  'flappy-bird': {
+    id: 'flappy-bird',
+    name: 'Flappy Bird',
+    icon: '🐤',
+    component: FlappyBird,
+    defaultWidth: 420,
+    defaultHeight: 600,
+    minWidth: 320,
+    minHeight: 450,
+    singleton: true,
+    tileSize: 'small',
+  },
   'games': {
     id: 'games',
     name: 'Games',
     icon: '📁',
     component: GamesFolder,
-    defaultWidth: 400,
-    defaultHeight: 350,
-    minWidth: 300,
-    minHeight: 250,
+    defaultWidth: 900,
+    defaultHeight: 600,
+    minWidth: 400,
+    minHeight: 300,
     singleton: true,
-    tileSize: 'small',
+    tileSize: 'medium',
   },
   'spreadsheet': {
     id: 'spreadsheet',
@@ -193,6 +220,18 @@ export const APP_REGISTRY: Record<string, AppDefinition> = {
     defaultHeight: 600,
     minWidth: 360,
     minHeight: 400,
+    singleton: true,
+    tileSize: 'medium',
+  },
+  'recycle-bin': {
+    id: 'recycle-bin',
+    name: 'Recycle Bin',
+    icon: '🗑️',
+    component: RecycleBin,
+    defaultWidth: 900,
+    defaultHeight: 600,
+    minWidth: 400,
+    minHeight: 300,
     singleton: true,
     tileSize: 'medium',
   },

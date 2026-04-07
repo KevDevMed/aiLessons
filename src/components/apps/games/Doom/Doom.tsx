@@ -7,6 +7,7 @@ import styles from './Doom.module.css';
 // ============================================================
 
 type GameScreen = 'title' | 'playing' | 'paused' | 'gameover' | 'levelcomplete';
+type WeaponType = 'pistol' | 'shotgun';
 
 type Player = {
   x: number;
@@ -19,6 +20,14 @@ type Player = {
   shootCooldown: number;
   hurtFlash: number;
   muzzleFlash: number;
+  shakeX: number;
+  shakeY: number;
+  recoilOffset: number;
+  pickupFlash: number;
+  weapon: WeaponType;
+  hasShotgun: boolean;
+  weaponSwitchTimer: number;
+  pendingWeapon: WeaponType;
 };
 
 type EnemyType = 'imp' | 'soldier' | 'demon';
@@ -39,9 +48,11 @@ type Enemy = {
   lastAttackTime: number;
   stateTimer: number;
   distanceToPlayer: number;
+  deathTimer: number;
+  muzzleFlash: number;
 };
 
-type ItemType = 'health' | 'ammo';
+type ItemType = 'health' | 'ammo' | 'shotgun';
 
 type Item = {
   x: number;
@@ -82,6 +93,342 @@ type GameMap = {
   exitZone: { x: number; y: number };
 };
 
+type FloatingText = {
+  text: string;
+  color: string;
+  timer: number;
+};
+
+type Particle = {
+  x: number;
+  y: number;
+  vx: number;
+  vy: number;
+  life: number;
+  maxLife: number;
+  r: number;
+  g: number;
+  b: number;
+};
+
+type WallMark = {
+  mapX: number;
+  mapY: number;
+  wallX: number;
+  side: 0 | 1;
+  life: number;
+};
+
+type Projectile = {
+  x: number;
+  y: number;
+  dx: number;
+  dy: number;
+  speed: number;
+  life: number;
+};
+
+// ============================================================
+// SOUND ENGINE (Web Audio API - procedural)
+// ============================================================
+
+class SoundEngine {
+  private ctx: AudioContext | null = null;
+  private masterGain: GainNode | null = null;
+  private noiseBuffer: AudioBuffer | null = null;
+  private ambientNodes: OscillatorNode[] = [];
+  private ambientGains: GainNode[] = [];
+  private ambientPlaying = false;
+
+  private ensureCtx(): AudioContext {
+    if (!this.ctx) {
+      this.ctx = new AudioContext();
+      this.masterGain = this.ctx.createGain();
+      this.masterGain.gain.value = 0.3;
+      this.masterGain.connect(this.ctx.destination);
+    }
+    if (this.ctx.state === 'suspended') {
+      this.ctx.resume();
+    }
+    return this.ctx;
+  }
+
+  private getMaster(): GainNode {
+    this.ensureCtx();
+    return this.masterGain!;
+  }
+
+  private getNoiseBuffer(): AudioBuffer {
+    if (!this.noiseBuffer) {
+      const ctx = this.ensureCtx();
+      const len = Math.floor(ctx.sampleRate * 0.2);
+      this.noiseBuffer = ctx.createBuffer(1, len, ctx.sampleRate);
+      const data = this.noiseBuffer.getChannelData(0);
+      for (let i = 0; i < len; i++) data[i] = Math.random() * 2 - 1;
+    }
+    return this.noiseBuffer;
+  }
+
+  playShoot(weapon: WeaponType = 'pistol') {
+    try {
+      const ctx = this.ensureCtx();
+      const now = ctx.currentTime;
+      const master = this.getMaster();
+
+      // Oscillator: pitch drop
+      const osc = ctx.createOscillator();
+      const oscGain = ctx.createGain();
+      osc.type = 'square';
+      osc.frequency.setValueAtTime(weapon === 'shotgun' ? 80 : 150, now);
+      osc.frequency.exponentialRampToValueAtTime(weapon === 'shotgun' ? 30 : 50, now + 0.1);
+      oscGain.gain.setValueAtTime(weapon === 'shotgun' ? 0.5 : 0.4, now);
+      oscGain.gain.exponentialRampToValueAtTime(0.01, now + 0.08);
+      osc.connect(oscGain);
+      oscGain.connect(master);
+      osc.start(now);
+      osc.stop(now + 0.15);
+
+      // Noise burst
+      const noise = ctx.createBufferSource();
+      noise.buffer = this.getNoiseBuffer();
+      const noiseGain = ctx.createGain();
+      const filter = ctx.createBiquadFilter();
+      filter.type = 'highpass';
+      filter.frequency.value = weapon === 'shotgun' ? 800 : 2000;
+      noiseGain.gain.setValueAtTime(weapon === 'shotgun' ? 0.5 : 0.3, now);
+      noiseGain.gain.exponentialRampToValueAtTime(0.01, now + (weapon === 'shotgun' ? 0.12 : 0.05));
+      noise.connect(filter);
+      filter.connect(noiseGain);
+      noiseGain.connect(master);
+      noise.start(now);
+      noise.stop(now + 0.2);
+    } catch {}
+  }
+
+  playEnemyHit() {
+    try {
+      const ctx = this.ensureCtx();
+      const now = ctx.currentTime;
+      const master = this.getMaster();
+
+      const noise = ctx.createBufferSource();
+      noise.buffer = this.getNoiseBuffer();
+      const gain = ctx.createGain();
+      const filter = ctx.createBiquadFilter();
+      filter.type = 'bandpass';
+      filter.frequency.value = 1200;
+      filter.Q.value = 2;
+      gain.gain.setValueAtTime(0.3, now);
+      gain.gain.exponentialRampToValueAtTime(0.01, now + 0.06);
+      noise.connect(filter);
+      filter.connect(gain);
+      gain.connect(master);
+      noise.start(now);
+      noise.stop(now + 0.08);
+    } catch {}
+  }
+
+  playEnemyDeath() {
+    try {
+      const ctx = this.ensureCtx();
+      const now = ctx.currentTime;
+      const master = this.getMaster();
+
+      // Descending sawtooth
+      const osc = ctx.createOscillator();
+      const oscGain = ctx.createGain();
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(400, now);
+      osc.frequency.exponentialRampToValueAtTime(80, now + 0.25);
+      oscGain.gain.setValueAtTime(0.15, now);
+      oscGain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+      osc.connect(oscGain);
+      oscGain.connect(master);
+      osc.start(now);
+      osc.stop(now + 0.35);
+
+      // Low rumble
+      const osc2 = ctx.createOscillator();
+      const osc2Gain = ctx.createGain();
+      osc2.type = 'sawtooth';
+      osc2.frequency.value = 60;
+      osc2Gain.gain.setValueAtTime(0.2, now);
+      osc2Gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+      osc2.connect(osc2Gain);
+      osc2Gain.connect(master);
+      osc2.start(now);
+      osc2.stop(now + 0.35);
+    } catch {}
+  }
+
+  playPlayerHurt() {
+    try {
+      const ctx = this.ensureCtx();
+      const now = ctx.currentTime;
+      const master = this.getMaster();
+
+      const noise = ctx.createBufferSource();
+      noise.buffer = this.getNoiseBuffer();
+      const gain = ctx.createGain();
+      const filter = ctx.createBiquadFilter();
+      filter.type = 'lowpass';
+      filter.frequency.value = 600;
+      gain.gain.setValueAtTime(0.4, now);
+      gain.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
+      noise.connect(filter);
+      filter.connect(gain);
+      gain.connect(master);
+      noise.start(now);
+      noise.stop(now + 0.18);
+
+      const osc = ctx.createOscillator();
+      const oscGain = ctx.createGain();
+      osc.type = 'sawtooth';
+      osc.frequency.value = 100;
+      oscGain.gain.setValueAtTime(0.2, now);
+      oscGain.gain.exponentialRampToValueAtTime(0.01, now + 0.12);
+      osc.connect(oscGain);
+      oscGain.connect(master);
+      osc.start(now);
+      osc.stop(now + 0.15);
+    } catch {}
+  }
+
+  playPickup(type: ItemType) {
+    try {
+      const ctx = this.ensureCtx();
+      const now = ctx.currentTime;
+      const master = this.getMaster();
+
+      if (type === 'health') {
+        const osc1 = ctx.createOscillator();
+        const g1 = ctx.createGain();
+        osc1.type = 'sine';
+        osc1.frequency.value = 440;
+        g1.gain.setValueAtTime(0.2, now);
+        g1.gain.exponentialRampToValueAtTime(0.01, now + 0.08);
+        osc1.connect(g1); g1.connect(master);
+        osc1.start(now); osc1.stop(now + 0.1);
+
+        const osc2 = ctx.createOscillator();
+        const g2 = ctx.createGain();
+        osc2.type = 'sine';
+        osc2.frequency.value = 660;
+        g2.gain.setValueAtTime(0.2, now + 0.08);
+        g2.gain.exponentialRampToValueAtTime(0.01, now + 0.16);
+        osc2.connect(g2); g2.connect(master);
+        osc2.start(now + 0.08); osc2.stop(now + 0.18);
+      } else if (type === 'shotgun') {
+        // Special pickup sound - triumphant
+        const freqs = [330, 440, 660];
+        freqs.forEach((f, i) => {
+          const osc = ctx.createOscillator();
+          const g = ctx.createGain();
+          osc.type = 'sine';
+          osc.frequency.value = f;
+          const t = now + i * 0.08;
+          g.gain.setValueAtTime(0.25, t);
+          g.gain.exponentialRampToValueAtTime(0.01, t + 0.1);
+          osc.connect(g); g.connect(master);
+          osc.start(t); osc.stop(t + 0.12);
+        });
+      } else {
+        const freqs = [330, 440, 550];
+        freqs.forEach((f, i) => {
+          const osc = ctx.createOscillator();
+          const g = ctx.createGain();
+          osc.type = 'triangle';
+          osc.frequency.value = f;
+          const t = now + i * 0.06;
+          g.gain.setValueAtTime(0.15, t);
+          g.gain.exponentialRampToValueAtTime(0.01, t + 0.06);
+          osc.connect(g); g.connect(master);
+          osc.start(t); osc.stop(t + 0.08);
+        });
+      }
+    } catch {}
+  }
+
+  playFootstep() {
+    try {
+      const ctx = this.ensureCtx();
+      const now = ctx.currentTime;
+      const master = this.getMaster();
+
+      const noise = ctx.createBufferSource();
+      noise.buffer = this.getNoiseBuffer();
+      const gain = ctx.createGain();
+      const filter = ctx.createBiquadFilter();
+      filter.type = 'bandpass';
+      filter.frequency.value = 200;
+      filter.Q.value = 1;
+      gain.gain.setValueAtTime(0.08, now);
+      gain.gain.exponentialRampToValueAtTime(0.01, now + 0.02);
+      noise.connect(filter);
+      filter.connect(gain);
+      gain.connect(master);
+      noise.start(now);
+      noise.stop(now + 0.04);
+    } catch {}
+  }
+
+  startAmbient() {
+    if (this.ambientPlaying) return;
+    try {
+      const ctx = this.ensureCtx();
+      const master = this.getMaster();
+      this.ambientPlaying = true;
+
+      const freqs = [55, 82.4, 110];
+      const gains = [0.04, 0.03, 0.02];
+      freqs.forEach((f, i) => {
+        const osc = ctx.createOscillator();
+        const g = ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.value = f;
+        g.gain.value = gains[i];
+        osc.connect(g);
+        g.connect(master);
+        osc.start();
+        this.ambientNodes.push(osc);
+        this.ambientGains.push(g);
+      });
+
+      // Filtered noise texture
+      const noise = ctx.createBufferSource();
+      noise.buffer = this.getNoiseBuffer();
+      noise.loop = true;
+      const nGain = ctx.createGain();
+      const nFilter = ctx.createBiquadFilter();
+      nFilter.type = 'lowpass';
+      nFilter.frequency.value = 100;
+      nGain.gain.value = 0.02;
+      noise.connect(nFilter);
+      nFilter.connect(nGain);
+      nGain.connect(master);
+      noise.start();
+      this.ambientNodes.push(noise as unknown as OscillatorNode);
+    } catch {}
+  }
+
+  stopAmbient() {
+    this.ambientPlaying = false;
+    for (const node of this.ambientNodes) {
+      try { node.stop(); } catch {}
+    }
+    this.ambientNodes = [];
+    this.ambientGains = [];
+  }
+
+  cleanup() {
+    this.stopAmbient();
+    if (this.ctx) {
+      try { this.ctx.close(); } catch {}
+      this.ctx = null;
+    }
+  }
+}
+
 // ============================================================
 // CONSTANTS
 // ============================================================
@@ -95,9 +442,22 @@ const MAX_RAY_DEPTH = 24;
 const MAX_RENDER_WIDTH = 480;
 const HUD_HEIGHT = 56;
 const MINIMAP_SCALE = 4;
-const SHOOT_COOLDOWN = 0.3;
-const WEAPON_DAMAGE = 15;
 const PICKUP_RANGE = 0.6;
+const MAX_PARTICLES = 100;
+const MAX_WALL_MARKS = 20;
+const MAX_PROJECTILES = 20;
+
+const WEAPON_DEFS: Record<WeaponType, {
+  damage: number;
+  spread: number;
+  pellets: number;
+  cooldown: number;
+  ammoPerShot: number;
+  recoilAmount: number;
+}> = {
+  pistol: { damage: 15, spread: 0, pellets: 1, cooldown: 0.3, ammoPerShot: 1, recoilAmount: 8 },
+  shotgun: { damage: 10, spread: 0.12, pellets: 5, cooldown: 0.8, ammoPerShot: 2, recoilAmount: 16 },
+};
 
 const WALL_COLORS: Record<number, { light: string; dark: string }> = {
   1: { light: '#8B6914', dark: '#5C4510' },
@@ -160,6 +520,7 @@ const MAPS: GameMap[] = [
       { x: 14.5, y: 2.5, type: 'ammo', value: 15 },
       { x: 11.5, y: 14.5, type: 'health', value: 25 },
       { x: 8.5, y: 9.5, type: 'ammo', value: 10 },
+      { x: 12.5, y: 8.5, type: 'shotgun', value: 0 },
     ],
     exitZone: { x: 22, y: 22 },
   },
@@ -275,8 +636,6 @@ const MAPS: GameMap[] = [
 // SPRITE DATA (procedural pixel art, 16x16)
 // ============================================================
 
-// Colors: R=red, O=orange, G=green, B=brown, D=dark, K=black, W=white, Y=yellow
-// _=transparent, L=lime, P=pink, S=silver, C=crimson
 const SPRITE_PALETTE: Record<string, string> = {
   R: '#cc2222', O: '#dd7711', G: '#338833', B: '#886633',
   D: '#443322', K: '#222222', W: '#eeeeee', Y: '#ddcc22',
@@ -441,12 +800,20 @@ export function Doom({ windowId: _windowId }: AppProps) {
   const wrapperRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
+  // Cached offscreen canvas (Phase 0 perf fix)
+  const offscreenRef = useRef<HTMLCanvasElement>(document.createElement('canvas'));
+  const offscreenSizeRef = useRef({ w: 0, h: 0 });
+
   // Game state refs
   const playerRef = useRef<Player>({
     x: 2.5, y: 2.5, angle: 0,
     health: 100, ammo: 50,
     bobPhase: 0, isMoving: false,
     shootCooldown: 0, hurtFlash: 0, muzzleFlash: 0,
+    shakeX: 0, shakeY: 0,
+    recoilOffset: 0, pickupFlash: 0,
+    weapon: 'pistol', hasShotgun: false,
+    weaponSwitchTimer: 0, pendingWeapon: 'pistol',
   });
   const enemiesRef = useRef<Enemy[]>([]);
   const itemsRef = useRef<Item[]>([]);
@@ -463,8 +830,18 @@ export function Doom({ windowId: _windowId }: AppProps) {
   const gameLoopRef = useRef<number>(0);
   const lastTimeRef = useRef<number>(0);
   const spriteCanvasesRef = useRef<Record<string, HTMLCanvasElement>>({});
+  const spriteImageDataRef = useRef<Record<string, ImageData>>({});
   const killCountRef = useRef(0);
   const totalKillsRef = useRef(0);
+  const gameTimeRef = useRef(0);
+  const lastBobSignRef = useRef(0);
+
+  // New effect refs
+  const floatingTextsRef = useRef<FloatingText[]>([]);
+  const particlesRef = useRef<Particle[]>([]);
+  const wallMarksRef = useRef<WallMark[]>([]);
+  const projectilesRef = useRef<Projectile[]>([]);
+  const soundRef = useRef<SoundEngine>(new SoundEngine());
 
   // UI state
   const [gameScreen, setGameScreen] = useState<GameScreen>('title');
@@ -474,17 +851,23 @@ export function Doom({ windowId: _windowId }: AppProps) {
   const [displayTotalEnemies, setDisplayTotalEnemies] = useState(0);
   const [displayLevel, setDisplayLevel] = useState(1);
   const [canvasSize, setCanvasSize] = useState({ width: 640, height: 480 });
+  const [displayWeapon, setDisplayWeapon] = useState<WeaponType>('pistol');
 
   // ============================================================
-  // INIT SPRITES
+  // INIT SPRITES (with ImageData caching - Phase 0 perf fix)
   // ============================================================
 
   const initSprites = useCallback(() => {
     const canvases: Record<string, HTMLCanvasElement> = {};
+    const imageDataCache: Record<string, ImageData> = {};
     for (const [name, data] of Object.entries(SPRITES)) {
-      canvases[name] = createSpriteCanvas(data, 2);
+      const canvas = createSpriteCanvas(data, 2);
+      canvases[name] = canvas;
+      const ctx = canvas.getContext('2d')!;
+      imageDataCache[name] = ctx.getImageData(0, 0, canvas.width, canvas.height);
     }
     spriteCanvasesRef.current = canvases;
+    spriteImageDataRef.current = imageDataCache;
   }, []);
 
   // ============================================================
@@ -506,6 +889,11 @@ export function Doom({ windowId: _windowId }: AppProps) {
     p.shootCooldown = 0;
     p.hurtFlash = 0;
     p.muzzleFlash = 0;
+    p.shakeX = 0;
+    p.shakeY = 0;
+    p.recoilOffset = 0;
+    p.pickupFlash = 0;
+    p.weaponSwitchTimer = 0;
 
     enemiesRef.current = map.enemies.map(e => {
       const def = ENEMY_DEFS[e.type];
@@ -518,6 +906,8 @@ export function Doom({ windowId: _windowId }: AppProps) {
         attackCooldown: def.cooldown, lastAttackTime: 0,
         stateTimer: 0,
         distanceToPlayer: 999,
+        deathTimer: 0,
+        muzzleFlash: 0,
       };
     });
 
@@ -526,6 +916,12 @@ export function Doom({ windowId: _windowId }: AppProps) {
       collected: false, bobPhase: Math.random() * Math.PI * 2,
     }));
 
+    // Clear effects
+    floatingTextsRef.current = [];
+    particlesRef.current = [];
+    wallMarksRef.current = [];
+    projectilesRef.current = [];
+
     killCountRef.current = 0;
     totalKillsRef.current = map.enemies.length;
     setDisplayKills(0);
@@ -533,6 +929,7 @@ export function Doom({ windowId: _windowId }: AppProps) {
     setDisplayLevel(levelIndex + 1);
     setDisplayHealth(p.health);
     setDisplayAmmo(p.ammo);
+    setDisplayWeapon(p.weapon);
   }, []);
 
   // ============================================================
@@ -634,57 +1031,120 @@ export function Doom({ windowId: _windowId }: AppProps) {
 
   const playerShoot = useCallback(() => {
     const p = playerRef.current;
-    if (p.ammo <= 0 || p.shootCooldown > 0) return;
+    const weapDef = WEAPON_DEFS[p.weapon];
+    if (p.ammo < weapDef.ammoPerShot || p.shootCooldown > 0 || p.weaponSwitchTimer > 0) return;
 
-    p.ammo--;
-    p.shootCooldown = SHOOT_COOLDOWN;
-    p.muzzleFlash = 0.1;
+    p.ammo -= weapDef.ammoPerShot;
+    p.shootCooldown = weapDef.cooldown;
+    p.muzzleFlash = p.weapon === 'shotgun' ? 0.15 : 0.1;
+    p.recoilOffset = -weapDef.recoilAmount;
+    p.shakeX += (Math.random() - 0.5) * (p.weapon === 'shotgun' ? 4 : 2);
+    p.shakeY += (Math.random() - 0.5) * (p.weapon === 'shotgun' ? 3 : 1.5);
     setDisplayAmmo(p.ammo);
 
-    const dirX = Math.cos(p.angle);
-    const dirY = Math.sin(p.angle);
+    soundRef.current.playShoot(p.weapon);
 
-    // Sort enemies by distance
-    const liveEnemies = enemiesRef.current
-      .filter(e => e.state !== 'dead')
-      .sort((a, b) => {
-        const da = (a.x - p.x) ** 2 + (a.y - p.y) ** 2;
-        const db = (b.x - p.x) ** 2 + (b.y - p.y) ** 2;
-        return da - db;
-      });
+    let hitAnyEnemy = false;
 
-    for (const enemy of liveEnemies) {
-      const ex = enemy.x - p.x;
-      const ey = enemy.y - p.y;
-      const dist = Math.sqrt(ex * ex + ey * ey);
-      if (dist > 20) continue;
+    for (let pellet = 0; pellet < weapDef.pellets; pellet++) {
+      const spreadAngle = weapDef.pellets > 1
+        ? (Math.random() - 0.5) * weapDef.spread * 2
+        : 0;
+      const pelletAngle = p.angle + spreadAngle;
+      const dirX = Math.cos(pelletAngle);
+      const dirY = Math.sin(pelletAngle);
 
-      // Check if enemy is roughly in crosshair direction
-      const enemyAngle = Math.atan2(ey, ex);
-      let angleDiff = enemyAngle - p.angle;
-      while (angleDiff > Math.PI) angleDiff -= 2 * Math.PI;
-      while (angleDiff < -Math.PI) angleDiff += 2 * Math.PI;
+      // Sort enemies by distance
+      const liveEnemies = enemiesRef.current
+        .filter(e => e.state !== 'dead')
+        .sort((a, b) => {
+          const da = (a.x - p.x) ** 2 + (a.y - p.y) ** 2;
+          const db = (b.x - p.x) ** 2 + (b.y - p.y) ** 2;
+          return da - db;
+        });
 
-      // Hit detection: wider at close range, narrower at distance
-      const hitAngle = Math.atan2(0.4, dist);
-      if (Math.abs(angleDiff) < hitAngle) {
-        // Check LOS
-        if (hasLineOfSight(p.x, p.y, enemy.x, enemy.y, mapRef.current.grid, mapRef.current.width, mapRef.current.height)) {
-          enemy.health -= WEAPON_DAMAGE;
-          if (enemy.health <= 0) {
-            enemy.state = 'dead';
-            enemy.health = 0;
-            killCountRef.current++;
-            setDisplayKills(killCountRef.current);
-          } else {
-            enemy.state = 'hurt';
-            enemy.stateTimer = 0.2;
+      let pelletHit = false;
+      for (const enemy of liveEnemies) {
+        const ex = enemy.x - p.x;
+        const ey = enemy.y - p.y;
+        const dist = Math.sqrt(ex * ex + ey * ey);
+        if (dist > 20) continue;
+
+        const enemyAngle = Math.atan2(ey, ex);
+        let angleDiff = enemyAngle - pelletAngle;
+        while (angleDiff > Math.PI) angleDiff -= 2 * Math.PI;
+        while (angleDiff < -Math.PI) angleDiff += 2 * Math.PI;
+
+        const hitAngle = Math.atan2(0.4, dist);
+        if (Math.abs(angleDiff) < hitAngle) {
+          if (hasLineOfSight(p.x, p.y, enemy.x, enemy.y, mapRef.current.grid, mapRef.current.width, mapRef.current.height)) {
+            enemy.health -= weapDef.damage;
+            hitAnyEnemy = true;
+            pelletHit = true;
+
+            // Spawn blood particles
+            for (let i = 0; i < 4; i++) {
+              if (particlesRef.current.length < MAX_PARTICLES) {
+                particlesRef.current.push({
+                  x: enemy.x, y: enemy.y,
+                  vx: (Math.random() - 0.5) * 3,
+                  vy: (Math.random() - 0.5) * 3,
+                  life: 0.5 + Math.random() * 0.5,
+                  maxLife: 1.0,
+                  r: 180 + Math.random() * 75, g: 0, b: 0,
+                });
+              }
+            }
+
+            if (enemy.health <= 0) {
+              enemy.state = 'dead';
+              enemy.health = 0;
+              enemy.deathTimer = 1.0;
+              killCountRef.current++;
+              setDisplayKills(killCountRef.current);
+              soundRef.current.playEnemyDeath();
+            } else {
+              enemy.state = 'hurt';
+              enemy.stateTimer = 0.2;
+              soundRef.current.playEnemyHit();
+            }
+            break;
           }
-          break; // Only hit first enemy in line
+        }
+      }
+
+      // Wall impact if pellet missed all enemies
+      if (!pelletHit) {
+        const wallHit = castRay(p.x, p.y, dirX, dirY);
+        if (wallHit.wallType > 0 && wallMarksRef.current.length < MAX_WALL_MARKS) {
+          wallMarksRef.current.push({
+            mapX: wallHit.mapX, mapY: wallHit.mapY,
+            wallX: wallHit.wallX, side: wallHit.side,
+            life: 3.0,
+          });
+          // Wall spark particles
+          const hitX = p.x + dirX * wallHit.distance;
+          const hitY = p.y + dirY * wallHit.distance;
+          for (let i = 0; i < 2; i++) {
+            if (particlesRef.current.length < MAX_PARTICLES) {
+              particlesRef.current.push({
+                x: hitX, y: hitY,
+                vx: (Math.random() - 0.5) * 2,
+                vy: (Math.random() - 0.5) * 2,
+                life: 0.3 + Math.random() * 0.3,
+                maxLife: 0.6,
+                r: 150, g: 140, b: 120,
+              });
+            }
+          }
         }
       }
     }
-  }, []);
+
+    if (!hitAnyEnemy) {
+      // No visual/audio feedback beyond wall marks already handled
+    }
+  }, [castRay]);
 
   // ============================================================
   // UPDATE PLAYER
@@ -722,17 +1182,48 @@ export function Doom({ windowId: _windowId }: AppProps) {
       if (isWalkable(p.x, p.y + moveY)) p.y += moveY;
 
       p.bobPhase += dt * 10;
+
+      // Footstep sound
+      const bobSign = Math.sin(p.bobPhase) >= 0 ? 1 : -1;
+      if (bobSign !== lastBobSignRef.current) {
+        lastBobSignRef.current = bobSign;
+        soundRef.current.playFootstep();
+      }
     }
 
     // Shooting
     if (p.shootCooldown > 0) p.shootCooldown -= dt;
-    if (keys.shoot && p.shootCooldown <= 0) {
+    if (keys.shoot && p.shootCooldown <= 0 && p.weaponSwitchTimer <= 0) {
       playerShoot();
+    }
+
+    // Weapon switching
+    if (p.weaponSwitchTimer > 0) {
+      const prevTimer = p.weaponSwitchTimer;
+      p.weaponSwitchTimer -= dt;
+      // Swap at halfway point
+      if (prevTimer > 0.2 && p.weaponSwitchTimer <= 0.2) {
+        p.weapon = p.pendingWeapon;
+        setDisplayWeapon(p.weapon);
+      }
+      if (p.weaponSwitchTimer < 0) p.weaponSwitchTimer = 0;
     }
 
     // Timers
     if (p.hurtFlash > 0) p.hurtFlash -= dt;
     if (p.muzzleFlash > 0) p.muzzleFlash -= dt;
+    if (p.pickupFlash > 0) p.pickupFlash -= dt;
+
+    // Decay screen shake
+    p.shakeX *= 0.85;
+    p.shakeY *= 0.85;
+    if (Math.abs(p.shakeX) < 0.1) p.shakeX = 0;
+    if (Math.abs(p.shakeY) < 0.1) p.shakeY = 0;
+
+    // Decay recoil
+    if (p.recoilOffset < 0) {
+      p.recoilOffset = Math.min(0, p.recoilOffset + dt * 80);
+    }
   }, [isWalkable, playerShoot]);
 
   // ============================================================
@@ -744,7 +1235,13 @@ export function Doom({ windowId: _windowId }: AppProps) {
     const map = mapRef.current;
 
     for (const enemy of enemiesRef.current) {
-      if (enemy.state === 'dead') continue;
+      // Decay enemy muzzle flash
+      if (enemy.muzzleFlash > 0) enemy.muzzleFlash -= dt;
+
+      if (enemy.state === 'dead') {
+        if (enemy.deathTimer > 0) enemy.deathTimer -= dt;
+        continue;
+      }
 
       const dx = p.x - enemy.x;
       const dy = p.y - enemy.y;
@@ -771,14 +1268,12 @@ export function Doom({ windowId: _windowId }: AppProps) {
           enemy.lastAttackTime = 0;
           continue;
         }
-        // Move toward player
         const moveX = Math.cos(enemy.angle) * enemy.speed * dt;
         const moveY = Math.sin(enemy.angle) * enemy.speed * dt;
 
         const newX = enemy.x + moveX;
         const newY = enemy.y + moveY;
 
-        // Simple collision for enemies
         const mx = Math.floor(newX);
         const my = Math.floor(newY);
         if (mx >= 0 && mx < map.width && my >= 0 && my < map.height && map.grid[my][mx] === 0) {
@@ -794,29 +1289,107 @@ export function Doom({ windowId: _windowId }: AppProps) {
         enemy.lastAttackTime += dt;
         if (enemy.lastAttackTime >= enemy.attackCooldown) {
           enemy.lastAttackTime = 0;
-          // Attack the player
           if (dist < enemy.attackRange + 0.5) {
             if (enemy.type === 'soldier') {
-              // Ranged: LOS check
               if (hasLineOfSight(enemy.x, enemy.y, p.x, p.y, map.grid, map.width, map.height)) {
                 const accuracy = Math.max(0.3, 1 - dist * 0.05);
+                enemy.muzzleFlash = 0.15;
+
+                // Spawn visual projectile
+                if (projectilesRef.current.length < MAX_PROJECTILES) {
+                  projectilesRef.current.push({
+                    x: enemy.x, y: enemy.y,
+                    dx: Math.cos(enemy.angle), dy: Math.sin(enemy.angle),
+                    speed: 12, life: 0.3,
+                  });
+                }
+
                 if (Math.random() < accuracy) {
                   p.health -= enemy.damage;
                   p.hurtFlash = 0.3;
+                  p.shakeX = (Math.random() - 0.5) * 8;
+                  p.shakeY = (Math.random() - 0.5) * 6;
                   setDisplayHealth(Math.max(0, p.health));
+                  soundRef.current.playPlayerHurt();
                 }
               }
             } else {
-              // Melee
               p.health -= enemy.damage;
               p.hurtFlash = 0.3;
+              p.shakeX = (Math.random() - 0.5) * 8;
+              p.shakeY = (Math.random() - 0.5) * 6;
               setDisplayHealth(Math.max(0, p.health));
+              soundRef.current.playPlayerHurt();
             }
           }
         }
         if (dist > enemy.attackRange + 1) {
           enemy.state = 'chase';
         }
+      }
+    }
+  }, []);
+
+  // ============================================================
+  // UPDATE PARTICLES
+  // ============================================================
+
+  const updateParticles = useCallback((dt: number) => {
+    const particles = particlesRef.current;
+    for (let i = particles.length - 1; i >= 0; i--) {
+      const part = particles[i];
+      part.x += part.vx * dt;
+      part.y += part.vy * dt;
+      part.vx *= 0.95;
+      part.vy *= 0.95;
+      part.life -= dt;
+      if (part.life <= 0) {
+        particles.splice(i, 1);
+      }
+    }
+  }, []);
+
+  // ============================================================
+  // UPDATE PROJECTILES
+  // ============================================================
+
+  const updateProjectiles = useCallback((dt: number) => {
+    const projs = projectilesRef.current;
+    for (let i = projs.length - 1; i >= 0; i--) {
+      const proj = projs[i];
+      proj.x += proj.dx * proj.speed * dt;
+      proj.y += proj.dy * proj.speed * dt;
+      proj.life -= dt;
+      if (proj.life <= 0) {
+        projs.splice(i, 1);
+      }
+    }
+  }, []);
+
+  // ============================================================
+  // UPDATE FLOATING TEXTS
+  // ============================================================
+
+  const updateFloatingTexts = useCallback((dt: number) => {
+    const texts = floatingTextsRef.current;
+    for (let i = texts.length - 1; i >= 0; i--) {
+      texts[i].timer -= dt;
+      if (texts[i].timer <= 0) {
+        texts.splice(i, 1);
+      }
+    }
+  }, []);
+
+  // ============================================================
+  // UPDATE WALL MARKS
+  // ============================================================
+
+  const updateWallMarks = useCallback((dt: number) => {
+    const marks = wallMarksRef.current;
+    for (let i = marks.length - 1; i >= 0; i--) {
+      marks[i].life -= dt;
+      if (marks[i].life <= 0) {
+        marks.splice(i, 1);
       }
     }
   }, []);
@@ -836,10 +1409,24 @@ export function Doom({ windowId: _windowId }: AppProps) {
           p.health = Math.min(100, p.health + item.value);
           item.collected = true;
           setDisplayHealth(p.health);
+          p.pickupFlash = 0.15;
+          soundRef.current.playPickup('health');
+          floatingTextsRef.current.push({ text: `+${item.value} HP`, color: '#44ff44', timer: 1.5 });
         } else if (item.type === 'ammo') {
           p.ammo = Math.min(200, p.ammo + item.value);
           item.collected = true;
           setDisplayAmmo(p.ammo);
+          p.pickupFlash = 0.15;
+          soundRef.current.playPickup('ammo');
+          floatingTextsRef.current.push({ text: `+${item.value} AMMO`, color: '#ffdd44', timer: 1.5 });
+        } else if (item.type === 'shotgun' && !p.hasShotgun) {
+          p.hasShotgun = true;
+          p.weapon = 'shotgun';
+          item.collected = true;
+          p.pickupFlash = 0.2;
+          setDisplayWeapon('shotgun');
+          soundRef.current.playPickup('shotgun');
+          floatingTextsRef.current.push({ text: 'SHOTGUN!', color: '#ff8844', timer: 2.0 });
         }
       }
     }
@@ -857,6 +1444,7 @@ export function Doom({ windowId: _windowId }: AppProps) {
     if (dx * dx + dy * dy < 1.0) {
       screenRef.current = 'levelcomplete';
       setGameScreen('levelcomplete');
+      soundRef.current.stopAmbient();
       try { document.exitPointerLock(); } catch {}
     }
   }, []);
@@ -904,6 +1492,12 @@ export function Doom({ windowId: _windowId }: AppProps) {
     }
     const zBuffer = zBufferRef.current;
 
+    const gameTime = gameTimeRef.current;
+    const exit = mapRef.current.exitZone;
+    const exitCX = exit.x + 0.5;
+    const exitCY = exit.y + 0.5;
+    const pDistToExit = Math.sqrt((p.x - exitCX) ** 2 + (p.y - exitCY) ** 2);
+
     // ---- FLOOR & CEILING ----
     for (let y = 0; y < viewH; y++) {
       const isCeiling = y < viewH / 2;
@@ -926,6 +1520,23 @@ export function Doom({ windowId: _windowId }: AppProps) {
 
       for (let x = 0; x < renderW; x++) {
         const idx = (y * renderW + x) * 4;
+
+        // Exit zone glow (floor only, when player is close enough)
+        if (!isCeiling && pDistToExit < 8) {
+          const cameraX = 2 * x / renderW - 1;
+          const floorX = p.x + rowDist * (dirX + planeX * cameraX);
+          const floorY = p.y + rowDist * (dirY + planeY * cameraX);
+          const eDx = floorX - exitCX;
+          const eDy = floorY - exitCY;
+          const eDist2 = eDx * eDx + eDy * eDy;
+          if (eDist2 < 2.0) {
+            const glow = (1 - eDist2 / 2.0) * (0.5 + 0.5 * Math.sin(gameTime * 4));
+            r = Math.min(255, r + Math.floor(60 * glow));
+            g = Math.min(255, g + Math.floor(80 * glow));
+            b = Math.min(255, b + Math.floor(20 * glow));
+          }
+        }
+
         data[idx] = r;
         data[idx + 1] = g;
         data[idx + 2] = b;
@@ -970,11 +1581,37 @@ export function Doom({ windowId: _windowId }: AppProps) {
 
       // Fake texture: darken edges of wall face
       const edgeFade = 1 - Math.pow(Math.abs(hit.wallX - 0.5) * 2, 4) * 0.3;
-      const finalShade = shade * edgeFade;
+      let finalShade = shade * edgeFade;
 
-      const fr = Math.floor(cr * finalShade);
-      const fg = Math.floor(cg * finalShade);
-      const fb = Math.floor(cb * finalShade);
+      // Wall marks (bullet holes)
+      let markDarken = 0;
+      for (const mark of wallMarksRef.current) {
+        if (mark.mapX === hit.mapX && mark.mapY === hit.mapY && mark.side === hit.side) {
+          const markDist = Math.abs(hit.wallX - mark.wallX);
+          if (markDist < 0.04) {
+            const markAlpha = (mark.life / 3.0) * (1 - markDist / 0.04);
+            markDarken = Math.max(markDarken, markAlpha * 0.7);
+          }
+        }
+      }
+
+      // Muzzle flash wall lighting
+      let flashBoost = 0;
+      if (p.muzzleFlash > 0 && hit.distance < 4) {
+        const flashIntensity = p.muzzleFlash * 10 * (1 - hit.distance / 4);
+        const centerFade = Math.max(0, 1 - Math.abs(col - renderW / 2) / (renderW * 0.4));
+        flashBoost = Math.max(0, flashIntensity * centerFade);
+      }
+
+      let fr = Math.floor(cr * finalShade * (1 - markDarken));
+      let fg = Math.floor(cg * finalShade * (1 - markDarken));
+      let fb = Math.floor(cb * finalShade * (1 - markDarken));
+
+      if (flashBoost > 0) {
+        fr = Math.min(255, fr + Math.floor(flashBoost * 40));
+        fg = Math.min(255, fg + Math.floor(flashBoost * 32));
+        fb = Math.min(255, fb + Math.floor(flashBoost * 12));
+      }
 
       for (let y = drawStart; y <= drawEnd; y++) {
         const idx = (y * renderW + col) * 4;
@@ -985,23 +1622,20 @@ export function Doom({ windowId: _windowId }: AppProps) {
       }
     }
 
-    // Put the buffer to a temporary canvas and scale to main canvas
-    const offscreen = document.createElement('canvas');
-    offscreen.width = renderW;
-    offscreen.height = renderH;
-    const offCtx = offscreen.getContext('2d')!;
-    offCtx.putImageData(buffer, 0, 0);
-
     // ---- SPRITES ----
-    // Combine enemies and items into sortable sprites
     type SpriteEntry = {
       x: number; y: number;
       type: string;
       dist: number;
       isEnemy: boolean;
       isItem: boolean;
+      isProjectile: boolean;
+      isParticle: boolean;
       enemyState?: EnemyState;
+      enemyDeathTimer?: number;
+      enemyMuzzleFlash?: number;
       itemType?: ItemType;
+      particleData?: Particle;
     };
 
     const spriteList: SpriteEntry[] = [];
@@ -1014,9 +1648,10 @@ export function Doom({ windowId: _windowId }: AppProps) {
         x: enemy.x, y: enemy.y,
         type: enemy.type,
         dist,
-        isEnemy: true,
-        isItem: false,
+        isEnemy: true, isItem: false, isProjectile: false, isParticle: false,
         enemyState: enemy.state,
+        enemyDeathTimer: enemy.deathTimer,
+        enemyMuzzleFlash: enemy.muzzleFlash,
       });
     }
 
@@ -1029,9 +1664,35 @@ export function Doom({ windowId: _windowId }: AppProps) {
         x: item.x, y: item.y,
         type: item.type,
         dist,
-        isEnemy: false,
-        isItem: true,
+        isEnemy: false, isItem: true, isProjectile: false, isParticle: false,
         itemType: item.type,
+      });
+    }
+
+    // Projectiles as sprites
+    for (const proj of projectilesRef.current) {
+      const dx = proj.x - p.x;
+      const dy = proj.y - p.y;
+      const dist = dx * dx + dy * dy;
+      spriteList.push({
+        x: proj.x, y: proj.y,
+        type: 'projectile',
+        dist,
+        isEnemy: false, isItem: false, isProjectile: true, isParticle: false,
+      });
+    }
+
+    // Particles as sprites
+    for (const part of particlesRef.current) {
+      const dx = part.x - p.x;
+      const dy = part.y - p.y;
+      const dist = dx * dx + dy * dy;
+      spriteList.push({
+        x: part.x, y: part.y,
+        type: 'particle',
+        dist,
+        isEnemy: false, isItem: false, isProjectile: false, isParticle: true,
+        particleData: part,
       });
     }
 
@@ -1047,7 +1708,7 @@ export function Doom({ windowId: _windowId }: AppProps) {
       const transformX = invDet * (dirY * sx - dirX * sy);
       const transformY = invDet * (-planeY * sx + planeX * sy);
 
-      if (transformY <= 0.1) continue; // Behind camera
+      if (transformY <= 0.1) continue;
 
       const spriteScreenX = Math.floor((renderW / 2) * (1 + transformX / transformY));
       const spriteH = Math.abs(Math.floor(viewH / transformY));
@@ -1058,38 +1719,57 @@ export function Doom({ windowId: _windowId }: AppProps) {
       const drawStartX = Math.max(0, Math.floor(spriteScreenX - spriteW / 2));
       const drawEndX = Math.min(renderW - 1, Math.floor(spriteScreenX + spriteW / 2));
 
-      // Distance shading for sprite
       const spriteDist = Math.sqrt(sprite.dist);
       const shade = Math.max(0.15, Math.min(1.0, 1.0 / (1.0 + spriteDist * spriteDist * 0.02)));
 
       if (sprite.isEnemy) {
-        const spriteCanvas = spriteCanvasesRef.current[sprite.type];
-        if (!spriteCanvas) continue;
+        const spriteImageData = spriteImageDataRef.current[sprite.type];
+        if (!spriteImageData) continue;
 
-        const texW = spriteCanvas.width;
-        const texH = spriteCanvas.height;
-
-        // Get pixel data from sprite canvas
-        const spriteCtx = spriteCanvas.getContext('2d')!;
-        const spriteImageData = spriteCtx.getImageData(0, 0, texW, texH);
+        const texW = spriteImageData.width;
+        const texH = spriteImageData.height;
         const spritePixels = spriteImageData.data;
+
+        // Death animation: collapse + dissolve
+        const isDead = sprite.enemyState === 'dead';
+        const deathTimer = sprite.enemyDeathTimer || 0;
+        const deathProgress = isDead ? Math.max(0, 1 - deathTimer) : 0;
+
+        // Collapse: reduce visible height, keep base grounded
+        const collapseRatio = isDead ? Math.max(0.15, 1 - deathProgress * 0.85) : 1;
+        const collapsedH = Math.floor(spriteH * collapseRatio);
+        const groundY = Math.floor(spriteH / 2 + viewH / 2);
+        const collapsedStartY = Math.max(0, groundY - collapsedH);
+        const collapsedEndY = Math.min(viewH - 1, groundY);
 
         // Tint based on state
         let tintR = 1, tintG = 1, tintB = 1;
         if (sprite.enemyState === 'hurt') { tintR = 2; tintG = 0.5; tintB = 0.5; }
-        if (sprite.enemyState === 'dead') { tintR = 0.3; tintG = 0.3; tintB = 0.3; }
+        if (isDead) {
+          tintR = 1 - deathProgress * 0.7;
+          tintG = 1 - deathProgress * 0.7;
+          tintB = 1 - deathProgress * 0.7;
+        }
+
+        const useStartY = isDead ? collapsedStartY : drawStartY;
+        const useEndY = isDead ? collapsedEndY : drawEndY;
 
         for (let col = drawStartX; col <= drawEndX; col++) {
-          if (transformY >= zBuffer[col]) continue; // Behind wall
+          if (transformY >= zBuffer[col]) continue;
           const texX = Math.floor(((col - (spriteScreenX - spriteW / 2)) / spriteW) * texW);
           if (texX < 0 || texX >= texW) continue;
 
-          for (let row = drawStartY; row <= drawEndY; row++) {
-            const texY = Math.floor(((row - (Math.floor(-spriteH / 2 + viewH / 2))) / spriteH) * texH);
+          for (let row = useStartY; row <= useEndY; row++) {
+            // Dissolve effect for nearly-dead enemies
+            if (isDead && deathTimer < 0.3 && ((col + row) % 2 === 0)) continue;
+
+            const texY = isDead
+              ? Math.floor(((row - collapsedStartY) / Math.max(1, collapsedEndY - collapsedStartY)) * texH)
+              : Math.floor(((row - (Math.floor(-spriteH / 2 + viewH / 2))) / spriteH) * texH);
             if (texY < 0 || texY >= texH) continue;
 
             const sIdx = (texY * texW + texX) * 4;
-            if (spritePixels[sIdx + 3] < 128) continue; // Transparent
+            if (spritePixels[sIdx + 3] < 128) continue;
 
             const idx = (row * renderW + col) * 4;
             data[idx] = Math.min(255, Math.floor(spritePixels[sIdx] * shade * tintR));
@@ -1097,16 +1777,37 @@ export function Doom({ windowId: _windowId }: AppProps) {
             data[idx + 2] = Math.min(255, Math.floor(spritePixels[sIdx + 2] * shade * tintB));
           }
         }
+
+        // Enemy muzzle flash (soldiers firing)
+        if ((sprite.enemyMuzzleFlash || 0) > 0 && sprite.enemyState !== 'dead') {
+          const flashR = Math.min(3, Math.floor(spriteH / 8));
+          const flashCX = spriteScreenX;
+          const flashCY = Math.floor(viewH / 2 - spriteH * 0.1);
+          const flashAlpha = (sprite.enemyMuzzleFlash || 0) * 8;
+          for (let fy = -flashR; fy <= flashR; fy++) {
+            for (let fx = -flashR; fx <= flashR; fx++) {
+              if (fx * fx + fy * fy > flashR * flashR) continue;
+              const px = flashCX + fx;
+              const py = flashCY + fy;
+              if (px < 0 || px >= renderW || py < 0 || py >= viewH) continue;
+              if (transformY >= zBuffer[px]) continue;
+              const idx = (py * renderW + px) * 4;
+              data[idx] = Math.min(255, data[idx] + Math.floor(200 * flashAlpha));
+              data[idx + 1] = Math.min(255, data[idx + 1] + Math.floor(160 * flashAlpha));
+              data[idx + 2] = Math.min(255, data[idx + 2] + Math.floor(50 * flashAlpha));
+            }
+          }
+        }
       } else if (sprite.isItem) {
-        // Draw items as simple colored circles
         const centerX = spriteScreenX;
-        const centerY = Math.floor(viewH / 2 + spriteH * 0.15); // Sit on ground
+        const centerY = Math.floor(viewH / 2 + spriteH * 0.15);
         const radius = Math.max(2, Math.floor(spriteH / 6));
 
         const isHealth = sprite.itemType === 'health';
-        const cr2 = isHealth ? 220 : 220;
-        const cg2 = isHealth ? 40 : 200;
-        const cb2 = isHealth ? 40 : 40;
+        const isShotgunPickup = sprite.itemType === 'shotgun';
+        const cr2 = isShotgunPickup ? 180 : (isHealth ? 220 : 220);
+        const cg2 = isShotgunPickup ? 120 : (isHealth ? 40 : 200);
+        const cb2 = isShotgunPickup ? 40 : (isHealth ? 40 : 40);
 
         for (let iy = -radius; iy <= radius; iy++) {
           for (let ix = -radius; ix <= radius; ix++) {
@@ -1123,56 +1824,213 @@ export function Doom({ windowId: _windowId }: AppProps) {
           }
         }
 
-        // Draw cross for health / box for ammo
+        // Draw cross for health / box for ammo / S for shotgun
         if (isHealth && radius > 3) {
           const crossSize = Math.max(1, Math.floor(radius * 0.5));
           for (let i = -crossSize; i <= crossSize; i++) {
             const px1 = centerX + i;
-            const py1 = centerY;
-            if (px1 >= 0 && px1 < renderW && py1 >= 0 && py1 < viewH && transformY < zBuffer[px1]) {
-              const idx = (py1 * renderW + px1) * 4;
+            if (px1 >= 0 && px1 < renderW && centerY >= 0 && centerY < viewH && transformY < zBuffer[px1]) {
+              const idx = (centerY * renderW + px1) * 4;
               data[idx] = 255; data[idx + 1] = 255; data[idx + 2] = 255;
             }
-            const px2 = centerX;
             const py2 = centerY + i;
-            if (px2 >= 0 && px2 < renderW && py2 >= 0 && py2 < viewH && transformY < zBuffer[px2]) {
-              const idx = (py2 * renderW + px2) * 4;
+            if (centerX >= 0 && centerX < renderW && py2 >= 0 && py2 < viewH && transformY < zBuffer[centerX]) {
+              const idx = (py2 * renderW + centerX) * 4;
               data[idx] = 255; data[idx + 1] = 255; data[idx + 2] = 255;
             }
+          }
+        } else if (isShotgunPickup && radius > 3) {
+          // Draw a small "S" shape as two horizontal lines
+          const s = Math.max(1, Math.floor(radius * 0.4));
+          for (let i = -s; i <= s; i++) {
+            const px = centerX + i;
+            if (px >= 0 && px < renderW && transformY < zBuffer[px]) {
+              // Top bar
+              const py1 = centerY - s;
+              if (py1 >= 0 && py1 < viewH) {
+                const idx = (py1 * renderW + px) * 4;
+                data[idx] = 255; data[idx + 1] = 255; data[idx + 2] = 255;
+              }
+              // Bottom bar
+              const py2 = centerY + s;
+              if (py2 >= 0 && py2 < viewH) {
+                const idx = (py2 * renderW + px) * 4;
+                data[idx] = 255; data[idx + 1] = 255; data[idx + 2] = 255;
+              }
+              // Middle bar
+              if (centerY >= 0 && centerY < viewH) {
+                const idx = (centerY * renderW + px) * 4;
+                data[idx] = 255; data[idx + 1] = 255; data[idx + 2] = 255;
+              }
+            }
+          }
+        }
+      } else if (sprite.isProjectile) {
+        // Render projectile as bright yellow-orange dot
+        const projRadius = Math.max(1, Math.floor(spriteH / 12));
+        const projCX = spriteScreenX;
+        const projCY = Math.floor(viewH / 2);
+        for (let iy = -projRadius; iy <= projRadius; iy++) {
+          for (let ix = -projRadius; ix <= projRadius; ix++) {
+            if (ix * ix + iy * iy > projRadius * projRadius) continue;
+            const px = projCX + ix;
+            const py = projCY + iy;
+            if (px < 0 || px >= renderW || py < 0 || py >= viewH) continue;
+            if (transformY >= zBuffer[px]) continue;
+            const idx = (py * renderW + px) * 4;
+            data[idx] = 255;
+            data[idx + 1] = 200;
+            data[idx + 2] = 50;
+            data[idx + 3] = 255;
+          }
+        }
+      } else if (sprite.isParticle && sprite.particleData) {
+        const part = sprite.particleData;
+        const alpha = Math.max(0, part.life / part.maxLife);
+        const partSize = Math.max(1, Math.floor(spriteH / 16));
+        const partCX = spriteScreenX;
+        const partCY = Math.floor(viewH / 2);
+        for (let iy = 0; iy < partSize; iy++) {
+          for (let ix = 0; ix < partSize; ix++) {
+            const px = partCX + ix;
+            const py = partCY + iy;
+            if (px < 0 || px >= renderW || py < 0 || py >= viewH) continue;
+            if (transformY >= zBuffer[px]) continue;
+            const idx = (py * renderW + px) * 4;
+            data[idx] = Math.floor(part.r * shade * alpha);
+            data[idx + 1] = Math.floor(part.g * shade * alpha);
+            data[idx + 2] = Math.floor(part.b * shade * alpha);
+            data[idx + 3] = 255;
           }
         }
       }
     }
 
-    // Re-put the buffer (now with sprites drawn into it)
+    // ---- Use cached offscreen canvas (Phase 0 perf fix) ----
+    const offscreen = offscreenRef.current;
+    if (offscreenSizeRef.current.w !== renderW || offscreenSizeRef.current.h !== renderH) {
+      offscreen.width = renderW;
+      offscreen.height = renderH;
+      offscreenSizeRef.current = { w: renderW, h: renderH };
+    }
+    const offCtx = offscreen.getContext('2d')!;
     offCtx.putImageData(buffer, 0, 0);
 
     // ---- DRAW WEAPON ----
     const weaponBobX = p.isMoving ? Math.sin(p.bobPhase) * 4 : 0;
     const weaponBobY = p.isMoving ? Math.abs(Math.cos(p.bobPhase)) * 3 : 0;
-    const weapX = Math.floor(renderW / 2 - 15 + weaponBobX);
-    const weapY = Math.floor(viewH - 40 + weaponBobY);
 
-    // Pistol shape
-    offCtx.fillStyle = '#555';
-    offCtx.fillRect(weapX + 10, weapY, 10, 30); // Barrel
-    offCtx.fillStyle = '#444';
-    offCtx.fillRect(weapX + 5, weapY + 20, 20, 20); // Grip
-    offCtx.fillStyle = '#666';
-    offCtx.fillRect(weapX + 8, weapY - 2, 14, 8); // Top slide
-    offCtx.fillStyle = '#333';
-    offCtx.fillRect(weapX + 12, weapY + 2, 3, 5); // Sight
+    // Weapon switch animation offset
+    let switchOffset = 0;
+    if (p.weaponSwitchTimer > 0) {
+      const t = p.weaponSwitchTimer / 0.4;
+      switchOffset = Math.sin(t * Math.PI) * 50;
+    }
+
+    const weapX = Math.floor(renderW / 2 - 15 + weaponBobX);
+    const weapY = Math.floor(viewH - 40 + weaponBobY + switchOffset + p.recoilOffset);
+
+    if (p.weapon === 'pistol') {
+      // Detailed pistol
+      // Barrel body
+      offCtx.fillStyle = '#555';
+      offCtx.fillRect(weapX + 8, weapY - 2, 14, 8);
+      // Barrel bore
+      offCtx.fillStyle = '#222';
+      offCtx.fillRect(weapX + 13, weapY, 4, 4);
+      // Top slide
+      offCtx.fillStyle = '#666';
+      offCtx.fillRect(weapX + 6, weapY - 4, 18, 6);
+      // Slide highlight
+      offCtx.fillStyle = '#777';
+      offCtx.fillRect(weapX + 7, weapY - 3, 16, 1);
+      // Slide serrations
+      offCtx.fillStyle = '#555';
+      offCtx.fillRect(weapX + 8, weapY - 4, 1, 4);
+      offCtx.fillRect(weapX + 11, weapY - 4, 1, 4);
+      offCtx.fillRect(weapX + 14, weapY - 4, 1, 4);
+      // Front sight
+      offCtx.fillStyle = '#444';
+      offCtx.fillRect(weapX + 20, weapY - 6, 2, 3);
+      // Rear sight
+      offCtx.fillRect(weapX + 8, weapY - 6, 2, 3);
+      // Grip
+      offCtx.fillStyle = '#444';
+      offCtx.fillRect(weapX + 5, weapY + 6, 20, 24);
+      // Trigger guard
+      offCtx.fillStyle = '#3a3a3a';
+      offCtx.fillRect(weapX + 10, weapY + 10, 8, 6);
+      // Trigger
+      offCtx.fillStyle = '#333';
+      offCtx.fillRect(weapX + 13, weapY + 10, 3, 5);
+      // Grip texture
+      offCtx.fillStyle = '#3a3a3a';
+      for (let i = 0; i < 4; i++) {
+        offCtx.fillRect(weapX + 7, weapY + 14 + i * 4, 16, 1);
+      }
+    } else {
+      // Shotgun
+      // Double barrel
+      offCtx.fillStyle = '#555';
+      offCtx.fillRect(weapX + 2, weapY - 4, 26, 5);
+      offCtx.fillRect(weapX + 2, weapY + 1, 26, 5);
+      // Barrel holes
+      offCtx.fillStyle = '#222';
+      offCtx.fillRect(weapX + 12, weapY - 3, 4, 3);
+      offCtx.fillRect(weapX + 12, weapY + 2, 4, 3);
+      // Barrel highlight
+      offCtx.fillStyle = '#666';
+      offCtx.fillRect(weapX + 3, weapY - 4, 24, 1);
+      // Receiver
+      offCtx.fillStyle = '#666';
+      offCtx.fillRect(weapX, weapY + 6, 30, 8);
+      offCtx.fillStyle = '#777';
+      offCtx.fillRect(weapX + 1, weapY + 7, 28, 1);
+      // Pump grip (wood)
+      offCtx.fillStyle = '#8B6914';
+      offCtx.fillRect(weapX + 4, weapY + 14, 22, 10);
+      // Wood grain
+      offCtx.fillStyle = '#7a5a10';
+      for (let i = 0; i < 3; i++) {
+        offCtx.fillRect(weapX + 5, weapY + 16 + i * 3, 20, 1);
+      }
+      // Stock
+      offCtx.fillStyle = '#8B6914';
+      offCtx.fillRect(weapX + 6, weapY + 24, 18, 14);
+      offCtx.fillStyle = '#7a5a10';
+      offCtx.fillRect(weapX + 7, weapY + 26, 16, 1);
+      offCtx.fillRect(weapX + 7, weapY + 30, 16, 1);
+    }
 
     // Muzzle flash
     if (p.muzzleFlash > 0) {
-      offCtx.fillStyle = `rgba(255, 200, 50, ${p.muzzleFlash * 10})`;
-      offCtx.beginPath();
-      offCtx.arc(weapX + 15, weapY - 8, 12, 0, Math.PI * 2);
-      offCtx.fill();
-      offCtx.fillStyle = `rgba(255, 255, 200, ${p.muzzleFlash * 10})`;
-      offCtx.beginPath();
-      offCtx.arc(weapX + 15, weapY - 8, 6, 0, Math.PI * 2);
-      offCtx.fill();
+      const alpha = Math.min(1, p.muzzleFlash * 10);
+
+      if (p.weapon === 'shotgun') {
+        // Double barrel flash
+        offCtx.fillStyle = `rgba(255, 180, 30, ${alpha})`;
+        offCtx.beginPath();
+        offCtx.arc(weapX + 12, weapY - 10, 10, 0, Math.PI * 2);
+        offCtx.fill();
+        offCtx.beginPath();
+        offCtx.arc(weapX + 18, weapY - 10, 10, 0, Math.PI * 2);
+        offCtx.fill();
+        // Combined glow
+        offCtx.fillStyle = `rgba(255, 255, 200, ${alpha * 0.6})`;
+        offCtx.beginPath();
+        offCtx.arc(weapX + 15, weapY - 10, 20, 0, Math.PI * 2);
+        offCtx.fill();
+      } else {
+        // Pistol: radial flash
+        const grad = offCtx.createRadialGradient(weapX + 15, weapY - 8, 0, weapX + 15, weapY - 8, 16);
+        grad.addColorStop(0, `rgba(255,255,255,${alpha})`);
+        grad.addColorStop(0.3, `rgba(255,220,100,${alpha * 0.8})`);
+        grad.addColorStop(1, 'rgba(255,150,0,0)');
+        offCtx.fillStyle = grad;
+        offCtx.beginPath();
+        offCtx.arc(weapX + 15, weapY - 8, 16, 0, Math.PI * 2);
+        offCtx.fill();
+      }
     }
 
     // ---- HUD ----
@@ -1230,14 +2088,11 @@ export function Doom({ windowId: _windowId }: AppProps) {
     offCtx.lineWidth = Math.max(1, Math.floor(faceSize * 0.1));
     offCtx.beginPath();
     if (p.health > 60) {
-      // Slight grin
       offCtx.arc(faceX, faceY + Math.floor(faceSize * 0.1), Math.floor(faceSize * 0.3), 0.2, Math.PI - 0.2);
     } else if (p.health > 30) {
-      // Straight line
       offCtx.moveTo(faceX - Math.floor(faceSize * 0.3), faceY + Math.floor(faceSize * 0.3));
       offCtx.lineTo(faceX + Math.floor(faceSize * 0.3), faceY + Math.floor(faceSize * 0.3));
     } else {
-      // Frown
       offCtx.arc(faceX, faceY + Math.floor(faceSize * 0.6), Math.floor(faceSize * 0.3), Math.PI + 0.2, -0.2);
     }
     offCtx.stroke();
@@ -1252,6 +2107,11 @@ export function Doom({ windowId: _windowId }: AppProps) {
     offCtx.fillText(`${killCountRef.current}/${totalKillsRef.current}`, Math.floor(renderW / 2 + faceSize + 30), hudY + hudH / 2 + 1);
     offCtx.textAlign = 'left';
 
+    // Weapon indicator
+    offCtx.fillStyle = '#aaa';
+    offCtx.font = `${Math.floor(hudH * 0.22)}px monospace`;
+    offCtx.fillText(p.weapon === 'shotgun' ? '[2]SG' : '[1]PT', 8, hudY + hudH - 4);
+
     // ---- MINIMAP ----
     const map = mapRef.current;
     const mmSize = Math.min(Math.floor(renderW * 0.25), map.width * MINIMAP_SCALE);
@@ -1260,7 +2120,6 @@ export function Doom({ windowId: _windowId }: AppProps) {
     const mmCellW = mmSize / map.width;
     const mmCellH = mmSize / map.height;
 
-    // Minimap background
     offCtx.fillStyle = 'rgba(0,0,0,0.6)';
     offCtx.fillRect(mmX, mmY, mmSize, mmSize);
 
@@ -1278,41 +2137,25 @@ export function Doom({ windowId: _windowId }: AppProps) {
     // Items on minimap
     for (const item of itemsRef.current) {
       if (item.collected) continue;
-      offCtx.fillStyle = item.type === 'health' ? '#44cc44' : '#cccc44';
-      offCtx.fillRect(
-        mmX + item.x * mmCellW - 1,
-        mmY + item.y * mmCellH - 1,
-        3, 3,
-      );
+      offCtx.fillStyle = item.type === 'health' ? '#44cc44' : item.type === 'shotgun' ? '#ff8844' : '#cccc44';
+      offCtx.fillRect(mmX + item.x * mmCellW - 1, mmY + item.y * mmCellH - 1, 3, 3);
     }
 
     // Enemies on minimap
     for (const enemy of enemiesRef.current) {
       if (enemy.state === 'dead') continue;
       offCtx.fillStyle = '#ff3333';
-      offCtx.fillRect(
-        mmX + enemy.x * mmCellW - 1,
-        mmY + enemy.y * mmCellH - 1,
-        3, 3,
-      );
+      offCtx.fillRect(mmX + enemy.x * mmCellW - 1, mmY + enemy.y * mmCellH - 1, 3, 3);
     }
 
     // Exit zone
     offCtx.fillStyle = '#ffff00';
-    offCtx.fillRect(
-      mmX + map.exitZone.x * mmCellW,
-      mmY + map.exitZone.y * mmCellH,
-      mmCellW + 0.5, mmCellH + 0.5,
-    );
+    offCtx.fillRect(mmX + map.exitZone.x * mmCellW, mmY + map.exitZone.y * mmCellH, mmCellW + 0.5, mmCellH + 0.5);
 
     // Player on minimap
     offCtx.fillStyle = '#00ff00';
     offCtx.beginPath();
-    offCtx.arc(
-      mmX + p.x * mmCellW,
-      mmY + p.y * mmCellH,
-      2, 0, Math.PI * 2,
-    );
+    offCtx.arc(mmX + p.x * mmCellW, mmY + p.y * mmCellH, 2, 0, Math.PI * 2);
     offCtx.fill();
 
     // Player direction line
@@ -1338,15 +2181,38 @@ export function Doom({ windowId: _windowId }: AppProps) {
     offCtx.moveTo(chX, chY + 2); offCtx.lineTo(chX, chY + 6);
     offCtx.stroke();
 
+    // ---- FLOATING TEXTS ----
+    for (const msg of floatingTextsRef.current) {
+      const alpha = Math.min(1, msg.timer * 2);
+      const yOff = Math.floor((1.5 - msg.timer) * 30);
+      offCtx.globalAlpha = alpha;
+      offCtx.fillStyle = msg.color;
+      offCtx.font = `bold ${Math.floor(renderW * 0.04)}px monospace`;
+      offCtx.textAlign = 'center';
+      offCtx.fillText(msg.text, renderW / 2, Math.floor(viewH * 0.35) - yOff);
+    }
+    offCtx.globalAlpha = 1;
+    offCtx.textAlign = 'left';
+
+    // ---- PICKUP FLASH ----
+    if (p.pickupFlash > 0) {
+      offCtx.fillStyle = `rgba(0, 255, 80, ${Math.min(0.25, p.pickupFlash * 2)})`;
+      offCtx.fillRect(0, 0, renderW, viewH);
+    }
+
     // ---- HURT FLASH ----
     if (p.hurtFlash > 0) {
       offCtx.fillStyle = `rgba(255, 0, 0, ${Math.min(0.4, p.hurtFlash)})`;
       offCtx.fillRect(0, 0, renderW, viewH);
     }
 
-    // ---- BLIT TO MAIN CANVAS ----
+    // ---- BLIT TO MAIN CANVAS (with screen shake) ----
     ctx.imageSmoothingEnabled = false;
-    ctx.drawImage(offscreen, 0, 0, W, H);
+    const sx = Math.round(p.shakeX * (W / renderW));
+    const sy = Math.round(p.shakeY * (renderH > 0 ? H / renderH : 1));
+    ctx.fillStyle = '#000';
+    if (sx !== 0 || sy !== 0) ctx.fillRect(0, 0, W, H);
+    ctx.drawImage(offscreen, sx, sy, W, H);
   }, [castRay]);
 
   // ============================================================
@@ -1358,21 +2224,27 @@ export function Doom({ windowId: _windowId }: AppProps) {
     lastTimeRef.current = timestamp;
 
     if (screenRef.current === 'playing') {
+      gameTimeRef.current += dt;
       updatePlayer(dt);
       updateEnemies(dt);
+      updateParticles(dt);
+      updateProjectiles(dt);
+      updateFloatingTexts(dt);
+      updateWallMarks(dt);
       checkItems();
       checkExit();
 
       if (playerRef.current.health <= 0) {
         screenRef.current = 'gameover';
         setGameScreen('gameover');
+        soundRef.current.stopAmbient();
         try { document.exitPointerLock(); } catch {}
       }
     }
 
     render();
     gameLoopRef.current = requestAnimationFrame(gameLoop);
-  }, [updatePlayer, updateEnemies, checkItems, checkExit, render]);
+  }, [updatePlayer, updateEnemies, updateParticles, updateProjectiles, updateFloatingTexts, updateWallMarks, checkItems, checkExit, render]);
 
   // ============================================================
   // GAME ACTIONS
@@ -1380,21 +2252,29 @@ export function Doom({ windowId: _windowId }: AppProps) {
 
   const startNewGame = useCallback(() => {
     initSprites();
-    playerRef.current.health = 100;
-    playerRef.current.ammo = 50;
+    const p = playerRef.current;
+    p.health = 100;
+    p.ammo = 50;
+    p.weapon = 'pistol';
+    p.hasShotgun = false;
+    p.weaponSwitchTimer = 0;
     setDisplayHealth(100);
     setDisplayAmmo(50);
+    setDisplayWeapon('pistol');
     loadLevel(0);
     screenRef.current = 'playing';
     setGameScreen('playing');
     lastTimeRef.current = performance.now();
+    gameTimeRef.current = 0;
     containerRef.current?.focus();
+    soundRef.current.startAmbient();
   }, [initSprites, loadLevel]);
 
   const resumeGame = useCallback(() => {
     screenRef.current = 'playing';
     setGameScreen('playing');
     containerRef.current?.focus();
+    soundRef.current.startAmbient();
   }, []);
 
   const returnToTitle = useCallback(() => {
@@ -1406,13 +2286,13 @@ export function Doom({ windowId: _windowId }: AppProps) {
       turnLeft: false, turnRight: false,
       shoot: false, use: false,
     };
+    soundRef.current.stopAmbient();
     try { document.exitPointerLock(); } catch {}
   }, []);
 
   const nextLevel = useCallback(() => {
     const next = currentLevelRef.current + 1;
     if (next >= MAPS.length) {
-      // Won the game - back to title
       returnToTitle();
       return;
     }
@@ -1420,12 +2300,14 @@ export function Doom({ windowId: _windowId }: AppProps) {
     screenRef.current = 'playing';
     setGameScreen('playing');
     containerRef.current?.focus();
+    soundRef.current.startAmbient();
   }, [loadLevel, returnToTitle]);
 
   const togglePause = useCallback(() => {
     if (screenRef.current === 'playing') {
       screenRef.current = 'paused';
       setGameScreen('paused');
+      soundRef.current.stopAmbient();
       try { document.exitPointerLock(); } catch {}
     } else if (screenRef.current === 'paused') {
       resumeGame();
@@ -1440,6 +2322,7 @@ export function Doom({ windowId: _windowId }: AppProps) {
     if (screenRef.current === 'title' || screenRef.current === 'gameover' || screenRef.current === 'levelcomplete') return;
 
     const keys = keysRef.current;
+    const p = playerRef.current;
     switch (e.code) {
       case 'KeyW': case 'ArrowUp': e.preventDefault(); keys.forward = true; break;
       case 'KeyS': case 'ArrowDown': e.preventDefault(); keys.backward = true; break;
@@ -1450,6 +2333,20 @@ export function Doom({ windowId: _windowId }: AppProps) {
       case 'Space': e.preventDefault(); keys.shoot = true; break;
       case 'KeyE': e.preventDefault(); keys.use = true; break;
       case 'Escape': e.preventDefault(); togglePause(); break;
+      case 'Digit1':
+        e.preventDefault();
+        if (p.weapon !== 'pistol' && p.weaponSwitchTimer <= 0 && p.shootCooldown <= 0) {
+          p.pendingWeapon = 'pistol';
+          p.weaponSwitchTimer = 0.4;
+        }
+        break;
+      case 'Digit2':
+        e.preventDefault();
+        if (p.hasShotgun && p.weapon !== 'shotgun' && p.weaponSwitchTimer <= 0 && p.shootCooldown <= 0) {
+          p.pendingWeapon = 'shotgun';
+          p.weaponSwitchTimer = 0.4;
+        }
+        break;
     }
   }, [togglePause]);
 
@@ -1552,6 +2449,12 @@ export function Doom({ windowId: _windowId }: AppProps) {
     return () => document.removeEventListener('pointerlockchange', onLockChange);
   }, []);
 
+  // Cleanup sound engine
+  useEffect(() => {
+    const sound = soundRef.current;
+    return () => sound.cleanup();
+  }, []);
+
   // ============================================================
   // RENDER JSX
   // ============================================================
@@ -1580,7 +2483,8 @@ export function Doom({ windowId: _windowId }: AppProps) {
             <button className={styles.menuButton} onClick={startNewGame}>NEW GAME</button>
             <div className={styles.controls}>
               WASD / Arrows - Move | Mouse - Look<br />
-              Click / Space - Shoot | ESC - Pause
+              Click / Space - Shoot | ESC - Pause<br />
+              1 / 2 - Switch Weapons
             </div>
           </div>
         )}

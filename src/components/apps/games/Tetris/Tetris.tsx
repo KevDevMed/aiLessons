@@ -121,6 +121,207 @@ function createBoard(): (string | null)[][] {
 
 const LINE_SCORES = [0, 100, 300, 500, 800];
 
+// ============================================================
+// SOUND ENGINE (Web Audio API - procedural)
+// ============================================================
+
+class TetrisSoundEngine {
+  private ctx: AudioContext | null = null;
+  private masterGain: GainNode | null = null;
+
+  private ensureCtx(): AudioContext {
+    if (!this.ctx) {
+      this.ctx = new AudioContext();
+      this.masterGain = this.ctx.createGain();
+      this.masterGain.gain.value = 0.3;
+      this.masterGain.connect(this.ctx.destination);
+    }
+    if (this.ctx.state === 'suspended') this.ctx.resume();
+    return this.ctx;
+  }
+
+  private getMaster(): GainNode {
+    this.ensureCtx();
+    return this.masterGain!;
+  }
+
+  playMove() {
+    try {
+      const ctx = this.ensureCtx();
+      const now = ctx.currentTime;
+      const master = this.getMaster();
+
+      const osc = ctx.createOscillator();
+      const g = ctx.createGain();
+      osc.type = 'square';
+      osc.frequency.value = 200;
+      g.gain.setValueAtTime(0.08, now);
+      g.gain.exponentialRampToValueAtTime(0.01, now + 0.03);
+      osc.connect(g);
+      g.connect(master);
+      osc.start(now);
+      osc.stop(now + 0.04);
+    } catch {}
+  }
+
+  playRotate() {
+    try {
+      const ctx = this.ensureCtx();
+      const now = ctx.currentTime;
+      const master = this.getMaster();
+
+      const osc = ctx.createOscillator();
+      const g = ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(300, now);
+      osc.frequency.exponentialRampToValueAtTime(500, now + 0.05);
+      g.gain.setValueAtTime(0.15, now);
+      g.gain.exponentialRampToValueAtTime(0.01, now + 0.06);
+      osc.connect(g);
+      g.connect(master);
+      osc.start(now);
+      osc.stop(now + 0.08);
+    } catch {}
+  }
+
+  playDrop() {
+    try {
+      const ctx = this.ensureCtx();
+      const now = ctx.currentTime;
+      const master = this.getMaster();
+
+      // Thud: low-freq hit
+      const osc = ctx.createOscillator();
+      const g = ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(150, now);
+      osc.frequency.exponentialRampToValueAtTime(40, now + 0.08);
+      g.gain.setValueAtTime(0.3, now);
+      g.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
+      osc.connect(g);
+      g.connect(master);
+      osc.start(now);
+      osc.stop(now + 0.12);
+    } catch {}
+  }
+
+  playLock() {
+    try {
+      const ctx = this.ensureCtx();
+      const now = ctx.currentTime;
+      const master = this.getMaster();
+
+      const osc = ctx.createOscillator();
+      const g = ctx.createGain();
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(120, now);
+      osc.frequency.exponentialRampToValueAtTime(60, now + 0.05);
+      g.gain.setValueAtTime(0.12, now);
+      g.gain.exponentialRampToValueAtTime(0.01, now + 0.06);
+      osc.connect(g);
+      g.connect(master);
+      osc.start(now);
+      osc.stop(now + 0.08);
+    } catch {}
+  }
+
+  playLineClear(count: number) {
+    try {
+      const ctx = this.ensureCtx();
+      const now = ctx.currentTime;
+      const master = this.getMaster();
+
+      // Ascending sweep — pitch scales with lines cleared
+      const baseFreq = 300 + count * 100;
+      const osc = ctx.createOscillator();
+      const g = ctx.createGain();
+      osc.type = 'square';
+      osc.frequency.setValueAtTime(baseFreq, now);
+      osc.frequency.exponentialRampToValueAtTime(baseFreq * 2, now + 0.15);
+      g.gain.setValueAtTime(0.2, now);
+      g.gain.exponentialRampToValueAtTime(0.01, now + 0.2);
+      osc.connect(g);
+      g.connect(master);
+      osc.start(now);
+      osc.stop(now + 0.25);
+
+      // Shimmer
+      const osc2 = ctx.createOscillator();
+      const g2 = ctx.createGain();
+      osc2.type = 'sine';
+      osc2.frequency.setValueAtTime(baseFreq * 1.5, now);
+      osc2.frequency.exponentialRampToValueAtTime(baseFreq * 3, now + 0.15);
+      g2.gain.setValueAtTime(0.1, now);
+      g2.gain.exponentialRampToValueAtTime(0.01, now + 0.2);
+      osc2.connect(g2);
+      g2.connect(master);
+      osc2.start(now);
+      osc2.stop(now + 0.25);
+    } catch {}
+  }
+
+  playLevelUp() {
+    try {
+      const ctx = this.ensureCtx();
+      const now = ctx.currentTime;
+      const master = this.getMaster();
+
+      const freqs = [330, 440, 550, 660];
+      freqs.forEach((f, i) => {
+        const osc = ctx.createOscillator();
+        const g = ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.value = f;
+        const t = now + i * 0.08;
+        g.gain.setValueAtTime(0.2, t);
+        g.gain.exponentialRampToValueAtTime(0.01, t + 0.1);
+        osc.connect(g);
+        g.connect(master);
+        osc.start(t);
+        osc.stop(t + 0.12);
+      });
+    } catch {}
+  }
+
+  playGameOver() {
+    try {
+      const ctx = this.ensureCtx();
+      const now = ctx.currentTime;
+      const master = this.getMaster();
+
+      const osc = ctx.createOscillator();
+      const g = ctx.createGain();
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(300, now);
+      osc.frequency.exponentialRampToValueAtTime(60, now + 0.5);
+      g.gain.setValueAtTime(0.2, now);
+      g.gain.exponentialRampToValueAtTime(0.01, now + 0.6);
+      osc.connect(g);
+      g.connect(master);
+      osc.start(now);
+      osc.stop(now + 0.65);
+
+      const osc2 = ctx.createOscillator();
+      const g2 = ctx.createGain();
+      osc2.type = 'square';
+      osc2.frequency.value = 50;
+      g2.gain.setValueAtTime(0.15, now + 0.1);
+      g2.gain.exponentialRampToValueAtTime(0.01, now + 0.5);
+      osc2.connect(g2);
+      g2.connect(master);
+      osc2.start(now + 0.1);
+      osc2.stop(now + 0.55);
+    } catch {}
+  }
+
+  cleanup() {
+    if (this.ctx) {
+      try { this.ctx.close(); } catch {}
+      this.ctx = null;
+    }
+  }
+}
+
 export function Tetris({ windowId: _windowId }: AppProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const nextCanvasRef = useRef<HTMLCanvasElement>(null);
@@ -135,6 +336,7 @@ export function Tetris({ windowId: _windowId }: AppProps) {
   const scoreRef = useRef(0);
   const linesRef = useRef(0);
   const levelRef = useRef(1);
+  const soundRef = useRef(new TetrisSoundEngine());
 
   const [score, setScore] = useState(0);
   const [lines, setLines] = useState(0);
@@ -276,6 +478,7 @@ export function Tetris({ windowId: _windowId }: AppProps) {
     if (collides(boardRef.current, currentRef.current)) {
       statusRef.current = 'over';
       setGameStatus('over');
+      soundRef.current.playGameOver();
       if (intervalRef.current !== null) {
         clearInterval(intervalRef.current);
         intervalRef.current = null;
@@ -293,14 +496,17 @@ export function Tetris({ windowId: _windowId }: AppProps) {
       currentRef.current = moved;
     } else {
       lockPiece(boardRef.current, piece);
+      soundRef.current.playLock();
       const cleared = clearLines(boardRef.current);
       if (cleared > 0) {
+        soundRef.current.playLineClear(cleared);
         linesRef.current += cleared;
         scoreRef.current += LINE_SCORES[cleared] * levelRef.current;
         const newLevel = Math.floor(linesRef.current / 10) + 1;
         if (newLevel !== levelRef.current) {
           levelRef.current = newLevel;
           setLevel(newLevel);
+          soundRef.current.playLevelUp();
           // Restart interval at new speed
           if (intervalRef.current !== null) {
             clearInterval(intervalRef.current);
@@ -324,14 +530,17 @@ export function Tetris({ windowId: _windowId }: AppProps) {
     setScore(scoreRef.current);
     currentRef.current = { ...piece, y: gy };
     lockPiece(boardRef.current, currentRef.current);
+    soundRef.current.playDrop();
     const cleared = clearLines(boardRef.current);
     if (cleared > 0) {
+      soundRef.current.playLineClear(cleared);
       linesRef.current += cleared;
       scoreRef.current += LINE_SCORES[cleared] * levelRef.current;
       const newLevel = Math.floor(linesRef.current / 10) + 1;
       if (newLevel !== levelRef.current) {
         levelRef.current = newLevel;
         setLevel(newLevel);
+        soundRef.current.playLevelUp();
         if (intervalRef.current !== null) {
           clearInterval(intervalRef.current);
         }
@@ -351,6 +560,7 @@ export function Tetris({ windowId: _windowId }: AppProps) {
       const moved = { ...piece, x: piece.x + dx, y: piece.y + dy };
       if (!collides(boardRef.current, moved)) {
         currentRef.current = moved;
+        if (dx !== 0) soundRef.current.playMove();
         draw();
       }
     },
@@ -369,6 +579,7 @@ export function Tetris({ windowId: _windowId }: AppProps) {
       const kicked = { ...candidate, x: candidate.x + kick };
       if (!collides(boardRef.current, kicked)) {
         currentRef.current = kicked;
+        soundRef.current.playRotate();
         draw();
         return;
       }
@@ -489,10 +700,12 @@ export function Tetris({ windowId: _windowId }: AppProps) {
 
   // Cleanup
   useEffect(() => {
+    const sound = soundRef.current;
     return () => {
       if (intervalRef.current !== null) {
         clearInterval(intervalRef.current);
       }
+      sound.cleanup();
     };
   }, []);
 
