@@ -1,10 +1,22 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
+import { ConvexProvider, ConvexReactClient } from 'convex/react'
 import './styles/global.css'
 import App from './App'
 
+const convexUrl = import.meta.env.VITE_CONVEX_URL as string | undefined
+if (!convexUrl) {
+  // Surface a clear error during dev rather than failing inside ConvexReactClient
+  console.error(
+    'VITE_CONVEX_URL is not set. Run `npx convex dev` to provision a deployment.',
+  )
+}
+const convex = new ConvexReactClient(convexUrl ?? '')
+
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <App />
+    <ConvexProvider client={convex}>
+      <App />
+    </ConvexProvider>
   </StrictMode>,
 )

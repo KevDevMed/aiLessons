@@ -17,6 +17,7 @@ import { ImageViewer } from '../components/apps/ImageViewer/ImageViewer';
 import { MediaPlayer } from '../components/apps/MediaPlayer/MediaPlayer';
 import PresentationsPanel from '../components/PresentationsPanel/PresentationsPanel';
 import { RecycleBin } from '../components/apps/RecycleBin/RecycleBin';
+import { NewsApp } from '../components/apps/News/NewsApp';
 
 export const APP_REGISTRY: Record<string, AppDefinition> = {
   'file-explorer': {
@@ -234,5 +235,17 @@ export const APP_REGISTRY: Record<string, AppDefinition> = {
     minHeight: 300,
     singleton: true,
     tileSize: 'medium',
+  },
+  'news': {
+    id: 'news',
+    name: 'News',
+    icon: '📰',
+    component: NewsApp,
+    defaultWidth: 1000,
+    defaultHeight: 700,
+    minWidth: 700,
+    minHeight: 500,
+    singleton: true,
+    tileSize: 'wide',
   },
 };
