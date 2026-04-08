@@ -42,7 +42,7 @@ export default function Desktop() {
   const [deletedAppIds, setDeletedAppIds] = useState<string[]>([]);
 
   const desktopApps = useMemo(() => {
-    const hiddenIds = ['presentation', 'presentation2', 'spreadsheet', 'image-viewer', 'media-player', 'snake', 'tetris', 'brick-breaker', 'doom', 'flappy-bird'];
+    const hiddenIds = ['presentation', 'presentation2', 'presentation3', 'spreadsheet', 'image-viewer', 'media-player', 'snake', 'tetris', 'brick-breaker', 'doom', 'flappy-bird'];
     const apps = Object.values(registry).filter((a) => !hiddenIds.includes(a.id) && !deletedAppIds.includes(a.id));
     switch (sortBy) {
       case 'name':
