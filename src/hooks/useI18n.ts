@@ -427,6 +427,207 @@ const dict: Record<Lang, Record<string, string>> = {
     'c2s24.p2': 'Stock prices of tech companies are falling because anyone can now create their own tools. The moat is disappearing.',
     'c2s24.p3': 'The value is no longer in what you know. It is in what you can imagine and create with the information you have.',
     'c2s24.closing': '"The illiterate of this century are not those who cannot read and write, but those who cannot learn, unlearn, and relearn."',
+
+    // ========== SESSION 3 — Fine-Tuning & Billing Packets Killer ==========
+
+    // Slide 1 - Title
+    'c3s1.title': 'Fine-Tuning & Billing Packets Killer',
+    'c3s1.subtitle': 'From open-source models to a working mobile app — built in three hours',
+
+    // Slide 2 - Session 2 Recap
+    'c3s2.title': 'Where We Left Off',
+    'c3s2.desc': 'Last session we compared AI models, set up OpenCode + OpenRouter, and built a container-tracking demo with Chrome DevTools MCP. Today we take the next step: teaching a model to do YOUR job.',
+    'c3s2.p1.title': 'Model Rankings',
+    'c3s2.p1.desc': 'We learned how to compare intelligence, code, and agentic benchmarks',
+    'c3s2.p2.title': 'OpenRouter + OpenCode',
+    'c3s2.p2.desc': 'One API key, any provider — Chinese models at 10x cheaper',
+    'c3s2.p3.title': 'Tracking Demo',
+    'c3s2.p3.desc': 'Codex + Chrome DevTools MCP automated container tracking end-to-end',
+
+    // Slide 3 - Agenda
+    'c3s3.title': 'Today\'s Agenda',
+    'c3s3.i1': 'What is fine-tuning and why it matters',
+    'c3s3.i2': 'Open-source does not mean free — licenses explained',
+    'c3s3.i3': 'Running models locally on your own hardware',
+    'c3s3.i4': 'The dark side: scams, deepfakes, and why awareness wins',
+    'c3s3.i5': 'The Billing Packets problem we want to solve',
+    'c3s3.i6': 'Live demo: a mobile app with Expo, React Native and Minimax',
+    'c3s3.i7': 'Connecting it all: CargoWise, EDI, email automation',
+    'c3s3.i8': 'Your homework: find YOUR first automation target',
+
+    // Slide 4 - What is Fine-Tuning?
+    'c3s4.title': 'What Is Fine-Tuning?',
+    'c3s4.desc': 'Fine-tuning is the process of taking a general-purpose model and teaching it to become an expert at a very specific task. You feed it thousands of examples, mark what is right and what is wrong, and the model gradually parameterizes itself to your domain.',
+    'c3s4.key': 'Imagine taking a smart generalist and training them for 10,000 hours on billing packets specifically — eventually they start naming HBLs, MBLs and ISFs faster than any human on your team. That is what fine-tuning does to a model.',
+
+    // Slide 5 - Open-Source ≠ Free
+    'c3s5.title': 'Open-Source Does NOT Mean Free',
+    'c3s5.desc': 'Open-source means the model weights and training code are published publicly. That is powerful — but "open" comes with licenses. Read them before you deploy a model into a commercial product.',
+    'c3s5.p1.title': 'Apache 2.0',
+    'c3s5.p1.desc': 'Permissive — you can use the model commercially, but you must include attribution and the license text',
+    'c3s5.p2.title': 'MIT',
+    'c3s5.p2.desc': 'Even simpler — commercial use allowed, minimal requirements, very liberal',
+    'c3s5.p3.title': 'Revenue Clauses',
+    'c3s5.p3.desc': 'Some licenses demand revenue-sharing above a threshold (e.g., $20M ARR). Always check before shipping',
+
+    // Slide 6 - Chinese Open-Source Revolution
+    'c3s6.title': 'The Chinese Open-Source Revolution',
+    'c3s6.desc': 'OpenAI has "open" in the name but publishes nothing. Meanwhile, Chinese labs put frontier-grade models on GitHub and let anyone download them. That completely changes the economics of AI for the rest of us.',
+    'c3s6.p1.title': 'GLM (Zhipu AI)',
+    'c3s6.p1.desc': 'GLM-5 is on a public GitHub repo. Download it, run it, fine-tune it — you only pay for the electricity',
+    'c3s6.p2.title': 'Qwen (Alibaba)',
+    'c3s6.p2.desc': 'Multiple sizes — from 3B for laptops up to 72B for GPU clusters. Competitive with GPT',
+    'c3s6.p3.title': 'Minimax',
+    'c3s6.p3.desc': 'Strong multimodal model for reading PDFs, images, and tables — exactly what we need for billing',
+
+    // Slide 7 - Running Models Locally
+    'c3s7.title': 'Running Models On Your Laptop',
+    'c3s7.desc': 'You do not need a supercomputer anymore. Modern quantized models run on 4-5 GB of RAM. Once a model is downloaded, it runs entirely on your machine — no internet, no external API calls, no data leaving your computer.',
+    'c3s7.s1': 'Install Ollama or LM Studio from their website',
+    'c3s7.s2': 'Browse models tagged "small" or "quantized" (look for 4GB, 5GB, 7GB sizes)',
+    'c3s7.s3': 'Download a model — it\'s just a file, like a movie',
+    'c3s7.s4': 'Run it. The first token proves your laptop is now a private AI',
+
+    // Slide 8 - Power of Fine-Tuning
+    'c3s8.title': 'The Power of Parameterization',
+    'c3s8.desc': 'Once you understand fine-tuning, the world looks different. You are no longer limited to what a model knows out of the box — you can transfer YOUR knowledge, YOUR process, YOUR judgment into a model and run it forever.',
+    'c3s8.quote': '"You can transfer your entire way of thinking to a model, and that model can replicate you. In a way, you become immortal — the things you know stop dying with you."',
+
+    // Slide 9 - The Dark Side
+    'c3s9.title': 'The Dark Side of Fine-Tuning',
+    'c3s9.desc': 'The same power that builds a Billing Packets Killer can also build scams, deepfakes, and fake documents. If you understand the tools, you are better equipped to defend yourself and your team.',
+    'c3s9.p1.title': 'Fraud & Scams',
+    'c3s9.p1.desc': 'Bad actors already use fine-tuned voice and text models to impersonate coworkers and relatives',
+    'c3s9.p2.title': 'Fake Documents',
+    'c3s9.p2.desc': 'Fine-tuned models can generate convincing fake invoices, IDs, and shipping paperwork',
+    'c3s9.p3.title': 'Your Defense: Awareness',
+    'c3s9.p3.desc': 'The more you understand how these tools work, the harder it is for anyone to trick you with them',
+    'c3s9.note': 'Stay informed. Teach your family to verify unexpected calls. Awareness is 90% of the defense.',
+
+    // Slide 10 - The Billing Packets Problem
+    'c3s10.title': 'The Billing Packets Problem',
+    'c3s10.desc': 'Every shipment generates a pile of documents — commercial invoice, ISF, customs clearance, packing list, main invoice — and the Billing Packets team has to open each one, classify it, extract key fields, and assemble a final packet. It is slow, repetitive, and error-prone.',
+    'c3s10.p1.title': 'Mixed File Types',
+    'c3s10.p1.desc': 'PDFs, Excels, scanned images — each needs different handling',
+    'c3s10.p2.title': 'Manual Classification',
+    'c3s10.p2.desc': 'Humans decide what each document is, then rename and sort it by hand',
+    'c3s10.p3.title': 'Data Entry Fatigue',
+    'c3s10.p3.desc': 'Same fields — customer, invoice number, booking, MML — typed again and again',
+
+    // Slide 11 - The Vision: A Mobile App
+    'c3s11.title': 'The Vision: A Mobile App',
+    'c3s11.desc': 'What if anyone on the Billing Packets team could open a phone app, point it at a shipment folder, and receive a fully organized billing packet in one minute? Here is how the flow works:',
+    'c3s11.s1': 'Open the app — log in as Camilo, Geraldine, Brian, whoever',
+    'c3s11.s2': 'Pick the shipment folder (downloaded from CargoWise)',
+    'c3s11.s3': 'Hit "Process" — Minimax reads every document',
+    'c3s11.s4': 'Review the auto-generated packet, fix anything weird, ship it',
+    'c3s11.note': 'A mobile app is not the only form factor — a web dashboard or a CargoWise plugin would work the same way.',
+
+    // Slide 12 - Tech Stack
+    'c3s12.title': 'The Tech Stack',
+    'c3s12.desc': 'Three ingredients got us from idea to working prototype in three hours. None of them require deep specialized knowledge — Claude Code did most of the heavy lifting from plain-English prompts.',
+    'c3s12.p1.title': 'Expo + React Native',
+    'c3s12.p1.desc': 'Cross-platform mobile framework — one codebase runs on iOS, Android, and a simulator on Mac',
+    'c3s12.p2.title': 'Minimax (the brain)',
+    'c3s12.p2.desc': 'Chinese multimodal model — reads PDFs and Excels, extracts fields, classifies document types',
+    'c3s12.p3.title': 'Claude Code (the builder)',
+    'c3s12.p3.desc': 'The agent that wrote the code, wired the APIs, and ran it in the simulator — from English prompts',
+
+    // Slide 13 - Workflow Part 1
+    'c3s13.title': 'Workflow: Feeding the Beast',
+    'c3s13.desc': 'The user experience is intentionally boring — that is the goal. You want the team to not even notice the AI is doing the work.',
+    'c3s13.s1': 'User picks a shipment folder with 5-15 documents',
+    'c3s13.s2': 'App shows a preview list: file names, sizes, icons',
+    'c3s13.s3': 'User taps "Process" — the files are uploaded to Minimax',
+    'c3s13.s4': 'A progress bar and a log stream show what the model is doing live',
+
+    // Slide 14 - Minimax Reads Documents
+    'c3s14.title': 'Minimax Reads Every Document',
+    'c3s14.desc': 'Minimax is where the magic happens. It understands what a PDF says, what columns an Excel has, and what kind of document is in front of it. Watch the log and you can literally see it think in real time.',
+
+    // Slide 15 - Classification
+    'c3s15.title': 'Automatic Classification',
+    'c3s15.desc': 'With just a handful of examples, Minimax learns to distinguish the six document types that matter for billing. No checkboxes, no folders, no manual sorting.',
+    'c3s15.p1.title': 'Invoices',
+    'c3s15.p1.desc': 'Main Invoice, Commercial Invoice — the model tells them apart by structure and fields',
+    'c3s15.p2.title': 'Customs & ISF',
+    'c3s15.p2.desc': 'ISF, customs clearance forms — detected by headers, phrasing, and layout',
+    'c3s15.p3.title': 'Logistics',
+    'c3s15.p3.desc': 'HBL, MBL, packing lists — recognized by standard field patterns',
+
+    // Slide 16 - Data Extraction
+    'c3s16.title': 'Data Extraction',
+    'c3s16.desc': 'After classification, the model pulls the fields that matter: customer name, invoice number, booking number, MML number, HBL, MBL. Everything lands in a clean JSON object with a confidence score.',
+
+    // Slide 17 - Output: Packet + Excel
+    'c3s17.title': 'The Final Packet',
+    'c3s17.desc': 'The app assembles everything into a single billing packet: a folder named after the booking number, with the documents renamed in the right order, plus a summary Excel.',
+    'c3s17.p1.title': 'Organized Folder',
+    'c3s17.p1.desc': 'Numbered and renamed files in the exact order the Billing Packets team expects',
+    'c3s17.p2.title': 'Summary Excel',
+    'c3s17.p2.desc': 'Every extracted field in one clean sheet — ready for downstream tools or email',
+
+    // Slide 18 - Backend Options
+    'c3s18.title': 'Backend: Convex, Supabase, or Nothing',
+    'c3s18.desc': 'If you want the app to be multi-user, save history, or enforce permissions, you need a backend. Good news: today\'s "Backend as a Service" options are stupidly easy — one prompt and Claude Code wires them up.',
+    'c3s18.p1.title': 'Convex',
+    'c3s18.p1.desc': 'Real-time database + auth + file storage with great TypeScript integration',
+    'c3s18.p2.title': 'Supabase',
+    'c3s18.p2.desc': 'Postgres under the hood, with auth, storage, and row-level security built in',
+    'c3s18.p3.title': 'BetterAuth',
+    'c3s18.p3.desc': 'When you just need auth bolted onto an existing backend — clean, modern, open-source',
+    'c3s18.note': 'For the demo we skipped the backend entirely — the app ran against a local folder to keep it simple.',
+
+    // Slide 19 - CargoWise + EDI
+    'c3s19.title': 'Integrating with CargoWise',
+    'c3s19.desc': 'You do not need humans to drop files into the app. CargoWise already uses EDI for automatic events — hook into those triggers and documents can flow in without anyone lifting a finger.',
+    'c3s19.s1': 'Configure a CargoWise trigger when a shipment is ready for billing',
+    'c3s19.s2': 'The trigger dumps the documents into a OneDrive / SharePoint folder',
+    'c3s19.s3': 'The app (or a backend job) watches the folder and auto-processes new shipments',
+    'c3s19.s4': 'The finished packet is emailed or posted back — zero manual steps',
+
+    // Slide 20 - Email & Automation
+    'c3s20.title': 'Email, Power Automate, Rules',
+    'c3s20.desc': 'The final piece is getting the packet where it needs to go. You do not have to build anything fancy — the tools your company already pays for will do it for you.',
+    'c3s20.p1.title': 'Outlook Rules',
+    'c3s20.p1.desc': 'Auto-save attachments from specific senders to specific folders — zero code',
+    'c3s20.p2.title': 'Power Automate',
+    'c3s20.p2.desc': 'Route files, trigger flows, notify teams, and move data between systems visually',
+    'c3s20.p3.title': 'Resend / Email API',
+    'c3s20.p3.desc': 'When you want your app to send the finished packet automatically with one tap',
+
+    // Slide 21 - Built in 3 Hours
+    'c3s21.title': 'Built in Three Hours',
+    'c3s21.desc': 'Everything you just saw — the mobile app, the classification, the extraction, the organized packet — took three hours to build. Not because the problem is easy, but because the agent does the grunt work while you focus on WHAT to build.',
+    'c3s21.key': 'Iterate, iterate, iterate. The first version will not be perfect. Week 1: MVP. Week 2: your team tries it and complains. Week 3: you fix it. Week 4: they cannot imagine going back.',
+
+    // Slide 22 - Automation as Liberation
+    'c3s22.title': 'Automation Is Liberation, Not Replacement',
+    'c3s22.p1.title': 'The Boring Work Disappears',
+    'c3s22.p1.desc': 'Repetitive data entry, renaming files, extracting the same fields — gone',
+    'c3s22.p2.title': 'The Creative Work Stays',
+    'c3s22.p2.desc': 'Judging edge cases, handling exceptions, improving the system — still human',
+    'c3s22.p3.title': 'You Are Still Needed',
+    'c3s22.p3.desc': 'The model does not understand context. It classifies. You decide.',
+    'c3s22.p4.title': 'Your Role Grows',
+    'c3s22.p4.desc': 'From data-entry clerk to process designer — and that is a promotion, not a threat',
+
+    // Slide 23 - Your Team Task
+    'c3s23.title': 'Your Team Task',
+    'c3s23.desc': 'This week, look at your own workflow. Find ONE repetitive thing you do every day and try to automate it — even if it is small.',
+    'c3s23.t1': 'Identify one repetitive task you do every day',
+    'c3s23.t2': 'Write it down step-by-step in plain English',
+    'c3s23.t3': 'Ask Claude Code or Codex to build a first version',
+    'c3s23.t4': 'Run it once, find what\'s wrong, fix it',
+    'c3s23.t5': 'Show it to one teammate and get feedback',
+    'c3s23.t6': 'Share it in the group chat — we all learn faster together',
+
+    // Slide 24 - Infinite Possibilities
+    'c3s24.title': 'Infinite Possibilities',
+    'c3s24.p1': 'The Billing Packets Killer is just one example. Every repetitive, document-heavy process in VOC / Harp Audit is an opportunity.',
+    'c3s24.p2': 'You do not need to be a developer. You need curiosity, a problem you want to solve, and the willingness to iterate.',
+    'c3s24.p3': 'Start this week. Pick one task. Build something. Even if it is ugly, even if it breaks — ship it and iterate.',
+    'c3s24.closing': '"I built the Billing Packets Killer in three hours. Imagine what YOU can build if you start today."',
   },
   es: {
     'os.title': 'SecondSession',
@@ -852,6 +1053,207 @@ const dict: Record<Lang, Record<string, string>> = {
     'c2s24.p2': 'Las acciones de las empresas de tecnologia estan cayendo porque cualquiera puede crear sus propias herramientas. La barrera esta desapareciendo.',
     'c2s24.p3': 'El valor ya no esta en lo que sabes. Esta en lo que puedes imaginar y crear con la informacion que tienes.',
     'c2s24.closing': '"Los analfabetas de este siglo no son aquellos que no pueden leer y escribir, sino aquellos que no pueden aprender, desaprender y reaprender."',
+
+    // ========== SESION 3 — Fine-Tuning y Billing Packets Killer ==========
+
+    // Slide 1 - Title
+    'c3s1.title': 'Fine-Tuning y Billing Packets Killer',
+    'c3s1.subtitle': 'De modelos open source a una app movil funcionando — hecha en tres horas',
+
+    // Slide 2 - Session 2 Recap
+    'c3s2.title': 'Donde Quedamos',
+    'c3s2.desc': 'La sesion pasada comparamos modelos, montamos OpenCode y OpenRouter, e hicimos una demo de tracking de contenedores con Chrome DevTools MCP. Hoy damos el siguiente paso: entrenar un modelo para que haga TU trabajo.',
+    'c3s2.p1.title': 'Ranking de Modelos',
+    'c3s2.p1.desc': 'Aprendimos a comparar benchmarks de inteligencia, codigo y agentico',
+    'c3s2.p2.title': 'OpenRouter + OpenCode',
+    'c3s2.p2.desc': 'Una sola API key, cualquier proveedor — modelos chinos 10 veces mas baratos',
+    'c3s2.p3.title': 'Demo de Tracking',
+    'c3s2.p3.desc': 'Codex + Chrome DevTools MCP automatizaron el tracking de contenedores de punta a punta',
+
+    // Slide 3 - Agenda
+    'c3s3.title': 'Agenda de Hoy',
+    'c3s3.i1': 'Que es fine-tuning y por que importa',
+    'c3s3.i2': 'Open source NO significa gratis — las licencias explicadas',
+    'c3s3.i3': 'Correr modelos localmente en tu propio hardware',
+    'c3s3.i4': 'El lado oscuro: estafas, deepfakes y por que la consciencia gana',
+    'c3s3.i5': 'El problema de Billing Packets que queremos resolver',
+    'c3s3.i6': 'Demo en vivo: app movil con Expo, React Native y Minimax',
+    'c3s3.i7': 'Conectando todo: CargoWise, EDI, automatizacion de correo',
+    'c3s3.i8': 'Tu tarea: encuentra TU primer objetivo de automatizacion',
+
+    // Slide 4 - What is Fine-Tuning?
+    'c3s4.title': 'Que Es Fine-Tuning?',
+    'c3s4.desc': 'Fine-tuning es el proceso de tomar un modelo de proposito general y entrenarlo para que sea experto en una tarea muy especifica. Le das miles de ejemplos, marcas que esta bien y que esta mal, y el modelo se va parametrizando a tu dominio.',
+    'c3s4.key': 'Imaginate tomar a un generalista inteligente y entrenarlo durante 10,000 horas solo con billing packets — al final termina reconociendo HBLs, MBLs e ISFs mas rapido que cualquier persona del equipo. Eso es lo que hace el fine-tuning a un modelo.',
+
+    // Slide 5 - Open-Source ≠ Free
+    'c3s5.title': 'Open Source NO Significa Gratis',
+    'c3s5.desc': 'Open source significa que los pesos del modelo y el codigo de entrenamiento son publicos. Eso es poderoso — pero "open" viene con licencias. Leelas antes de meter un modelo en un producto comercial.',
+    'c3s5.p1.title': 'Apache 2.0',
+    'c3s5.p1.desc': 'Permisiva — puedes usarla comercialmente, pero debes incluir atribucion y el texto de la licencia',
+    'c3s5.p2.title': 'MIT',
+    'c3s5.p2.desc': 'Aun mas simple — uso comercial permitido, requisitos minimos, muy liberal',
+    'c3s5.p3.title': 'Clausulas de Revenue',
+    'c3s5.p3.desc': 'Algunas licencias exigen compartir ingresos por encima de un umbral (ej: $20M ARR). Siempre verifica antes de lanzar',
+
+    // Slide 6 - Chinese Open-Source Revolution
+    'c3s6.title': 'La Revolucion Open Source China',
+    'c3s6.desc': 'OpenAI tiene "open" en el nombre pero no publica nada. Mientras tanto, los laboratorios chinos suben modelos de nivel frontera a GitHub y dejan que cualquiera los descargue. Eso cambia completamente la economia de la IA para el resto de nosotros.',
+    'c3s6.p1.title': 'GLM (Zhipu AI)',
+    'c3s6.p1.desc': 'GLM-5 esta en un repo publico de GitHub. Lo descargas, lo corres, le haces fine-tuning — solo pagas la electricidad',
+    'c3s6.p2.title': 'Qwen (Alibaba)',
+    'c3s6.p2.desc': 'Varios tamanos — desde 3B para laptops hasta 72B para clusters GPU. Compite con GPT',
+    'c3s6.p3.title': 'Minimax',
+    'c3s6.p3.desc': 'Fuerte modelo multimodal para leer PDFs, imagenes y tablas — exactamente lo que necesitamos para billing',
+
+    // Slide 7 - Running Models Locally
+    'c3s7.title': 'Corriendo Modelos En Tu Laptop',
+    'c3s7.desc': 'Ya no necesitas una supercomputadora. Los modelos cuantizados modernos corren con 4 o 5 GB de RAM. Una vez que descargas el modelo, corre totalmente en tu maquina — sin internet, sin APIs externas, sin que tus datos salgan del computador.',
+    'c3s7.s1': 'Instala Ollama o LM Studio desde su pagina',
+    'c3s7.s2': 'Busca modelos con tag "small" o "quantized" (ve los tamanos 4GB, 5GB, 7GB)',
+    'c3s7.s3': 'Descarga un modelo — es solo un archivo, como una pelicula',
+    'c3s7.s4': 'Corrélo. El primer token te muestra que tu laptop ya es una IA privada',
+
+    // Slide 8 - Power of Fine-Tuning
+    'c3s8.title': 'El Poder de la Parametrizacion',
+    'c3s8.desc': 'Cuando entiendes fine-tuning, el mundo se ve distinto. Ya no estas limitado a lo que el modelo sabe de fabrica — puedes transferir TU conocimiento, TU proceso, TU criterio a un modelo y dejarlo correr para siempre.',
+    'c3s8.quote': '"Puedes pasar todo tu nivel de pensamiento hacia un modelo, y ese modelo te puede replicar. De alguna forma, te vuelves inmortal — lo que sabes deja de morir contigo."',
+
+    // Slide 9 - The Dark Side
+    'c3s9.title': 'El Lado Oscuro del Fine-Tuning',
+    'c3s9.desc': 'El mismo poder que construye un Billing Packets Killer tambien puede construir estafas, deepfakes y documentos falsos. Si entiendes las herramientas, estas mejor preparado para defender a ti y a tu equipo.',
+    'c3s9.p1.title': 'Fraude y Estafas',
+    'c3s9.p1.desc': 'Los malos actores ya usan modelos de voz y texto fine-tuneados para suplantar companeros y familiares',
+    'c3s9.p2.title': 'Documentos Falsos',
+    'c3s9.p2.desc': 'Modelos fine-tuneados pueden generar facturas, IDs y papeleo de embarque falsos muy convincentes',
+    'c3s9.p3.title': 'Tu Defensa: Consciencia',
+    'c3s9.p3.desc': 'Entre mas entiendas como funcionan estas herramientas, mas dificil es que alguien te enganie con ellas',
+    'c3s9.note': 'Mantente informado. Ensenale a tu familia a verificar llamadas inesperadas. La consciencia es el 90% de la defensa.',
+
+    // Slide 10 - The Billing Packets Problem
+    'c3s10.title': 'El Problema de Billing Packets',
+    'c3s10.desc': 'Cada embarque genera una pila de documentos — commercial invoice, ISF, customs clearance, packing list, main invoice — y el equipo de Billing Packets tiene que abrir cada uno, clasificarlo, extraer campos clave y armar el packet final. Es lento, repetitivo y propenso a errores.',
+    'c3s10.p1.title': 'Tipos de Archivo Mezclados',
+    'c3s10.p1.desc': 'PDFs, Excels, imagenes escaneadas — cada uno necesita un manejo distinto',
+    'c3s10.p2.title': 'Clasificacion Manual',
+    'c3s10.p2.desc': 'Un humano decide que es cada documento, lo renombra y lo organiza a mano',
+    'c3s10.p3.title': 'Fatiga de Data Entry',
+    'c3s10.p3.desc': 'Los mismos campos — cliente, numero de factura, booking, MML — escritos una y otra vez',
+
+    // Slide 11 - The Vision: A Mobile App
+    'c3s11.title': 'La Vision: Una App Movil',
+    'c3s11.desc': 'Y si cualquiera del equipo de Billing Packets pudiera abrir una app en el celular, apuntarla a una carpeta de un embarque, y recibir un packet organizado en un minuto? Asi funciona el flujo:',
+    'c3s11.s1': 'Abrir la app — iniciar sesion como Camilo, Geraldine, Brian, el que sea',
+    'c3s11.s2': 'Escoger la carpeta del embarque (descargada de CargoWise)',
+    'c3s11.s3': 'Darle a "Procesar" — Minimax lee todos los documentos',
+    'c3s11.s4': 'Revisar el packet auto-generado, arreglar lo raro, y enviarlo',
+    'c3s11.note': 'Una app movil no es el unico formato — un dashboard web o un plugin de CargoWise funcionarian igual.',
+
+    // Slide 12 - Tech Stack
+    'c3s12.title': 'El Stack Tecnico',
+    'c3s12.desc': 'Tres ingredientes nos llevaron de la idea a un prototipo funcionando en tres horas. Ninguno requiere conocimiento tecnico profundo — Claude Code hizo casi todo el trabajo pesado desde prompts en ingles simple.',
+    'c3s12.p1.title': 'Expo + React Native',
+    'c3s12.p1.desc': 'Framework movil multiplataforma — un solo codigo corre en iOS, Android, y un simulador en Mac',
+    'c3s12.p2.title': 'Minimax (el cerebro)',
+    'c3s12.p2.desc': 'Modelo multimodal chino — lee PDFs y Excels, extrae campos, clasifica tipos de documento',
+    'c3s12.p3.title': 'Claude Code (el constructor)',
+    'c3s12.p3.desc': 'El agente que escribio el codigo, conecto las APIs y lo corrio en el simulador — desde prompts en ingles',
+
+    // Slide 13 - Workflow Part 1
+    'c3s13.title': 'Flujo: Alimentando la Bestia',
+    'c3s13.desc': 'La experiencia del usuario es intencionalmente aburrida — ese es el objetivo. Queremos que el equipo ni se de cuenta de que hay IA haciendo el trabajo.',
+    'c3s13.s1': 'El usuario escoge una carpeta de embarque con 5 a 15 documentos',
+    'c3s13.s2': 'La app muestra una lista: nombres de archivo, tamanos, iconos',
+    'c3s13.s3': 'El usuario toca "Procesar" — los archivos suben a Minimax',
+    'c3s13.s4': 'Una barra de progreso y un log muestran lo que el modelo esta haciendo en vivo',
+
+    // Slide 14 - Minimax Reads Documents
+    'c3s14.title': 'Minimax Lee Cada Documento',
+    'c3s14.desc': 'Aqui esta la magia. Minimax entiende lo que dice un PDF, que columnas tiene un Excel, y que tipo de documento tiene al frente. Si ves el log, literalmente puedes ver al modelo pensar en tiempo real.',
+
+    // Slide 15 - Classification
+    'c3s15.title': 'Clasificacion Automatica',
+    'c3s15.desc': 'Con solo un punado de ejemplos, Minimax aprende a distinguir los seis tipos de documento que importan para billing. Sin checkboxes, sin carpetas, sin organizar a mano.',
+    'c3s15.p1.title': 'Facturas',
+    'c3s15.p1.desc': 'Main Invoice, Commercial Invoice — el modelo las distingue por estructura y campos',
+    'c3s15.p2.title': 'Customs e ISF',
+    'c3s15.p2.desc': 'ISF, formularios de customs — detectados por los headers, la redaccion y el layout',
+    'c3s15.p3.title': 'Logistica',
+    'c3s15.p3.desc': 'HBL, MBL, packing lists — reconocidos por patrones estandar de campos',
+
+    // Slide 16 - Data Extraction
+    'c3s16.title': 'Extraccion de Datos',
+    'c3s16.desc': 'Despues de clasificar, el modelo saca los campos que importan: nombre del cliente, numero de factura, numero de booking, numero de MML, HBL, MBL. Todo llega a un JSON limpio con un score de confianza.',
+
+    // Slide 17 - Output: Packet + Excel
+    'c3s17.title': 'El Packet Final',
+    'c3s17.desc': 'La app arma todo en un solo billing packet: una carpeta nombrada con el booking number, con los documentos renombrados en el orden correcto, mas un Excel de resumen.',
+    'c3s17.p1.title': 'Carpeta Organizada',
+    'c3s17.p1.desc': 'Archivos numerados y renombrados en el orden exacto que espera el equipo de Billing Packets',
+    'c3s17.p2.title': 'Excel de Resumen',
+    'c3s17.p2.desc': 'Cada campo extraido en una sola hoja limpia — lista para herramientas o correo',
+
+    // Slide 18 - Backend Options
+    'c3s18.title': 'Backend: Convex, Supabase o Nada',
+    'c3s18.desc': 'Si quieres que la app sea multi-usuario, guarde historial o aplique permisos, necesitas un backend. Buenas noticias: los "Backend as a Service" de hoy son ridiculamente faciles — un solo prompt y Claude Code los conecta.',
+    'c3s18.p1.title': 'Convex',
+    'c3s18.p1.desc': 'Base de datos en tiempo real + auth + storage de archivos con gran integracion de TypeScript',
+    'c3s18.p2.title': 'Supabase',
+    'c3s18.p2.desc': 'Postgres por debajo, con auth, storage y seguridad a nivel de fila incluidos',
+    'c3s18.p3.title': 'BetterAuth',
+    'c3s18.p3.desc': 'Cuando solo necesitas auth encima de un backend existente — limpio, moderno, open source',
+    'c3s18.note': 'En la demo nos saltamos el backend por completo — la app corrio contra una carpeta local para mantenerlo simple.',
+
+    // Slide 19 - CargoWise + EDI
+    'c3s19.title': 'Integrando con CargoWise',
+    'c3s19.desc': 'No necesitas humanos soltando archivos en la app. CargoWise ya usa EDI para eventos automaticos — engancha esos triggers y los documentos pueden entrar solos sin que nadie mueva un dedo.',
+    'c3s19.s1': 'Configura un trigger en CargoWise cuando un embarque este listo para billing',
+    'c3s19.s2': 'El trigger deja los documentos en una carpeta de OneDrive / SharePoint',
+    'c3s19.s3': 'La app (o un job en el backend) vigila la carpeta y procesa nuevos embarques',
+    'c3s19.s4': 'El packet terminado se envia por correo o se publica de vuelta — cero pasos manuales',
+
+    // Slide 20 - Email & Automation
+    'c3s20.title': 'Correo, Power Automate, Reglas',
+    'c3s20.desc': 'La ultima pieza es llevar el packet a donde tiene que ir. No tienes que construir nada sofisticado — las herramientas que tu empresa ya paga lo hacen por ti.',
+    'c3s20.p1.title': 'Reglas de Outlook',
+    'c3s20.p1.desc': 'Guarda adjuntos de remitentes especificos en carpetas especificas — sin escribir codigo',
+    'c3s20.p2.title': 'Power Automate',
+    'c3s20.p2.desc': 'Rutea archivos, dispara flujos, notifica equipos y mueve datos entre sistemas visualmente',
+    'c3s20.p3.title': 'Resend / Email API',
+    'c3s20.p3.desc': 'Cuando quieres que tu app mande el packet terminado automaticamente con un toque',
+
+    // Slide 21 - Built in 3 Hours
+    'c3s21.title': 'Hecho en Tres Horas',
+    'c3s21.desc': 'Todo lo que acabas de ver — la app movil, la clasificacion, la extraccion, el packet organizado — tomo tres horas. No porque el problema sea facil, sino porque el agente hace el trabajo pesado mientras tu te enfocas en QUE construir.',
+    'c3s21.key': 'Iterar, iterar, iterar. La primera version no va a ser perfecta. Semana 1: MVP. Semana 2: tu equipo la prueba y se queja. Semana 3: la arreglas. Semana 4: no se imaginan vivir sin ella.',
+
+    // Slide 22 - Automation as Liberation
+    'c3s22.title': 'La Automatizacion Es Liberacion, No Reemplazo',
+    'c3s22.p1.title': 'El Trabajo Aburrido Desaparece',
+    'c3s22.p1.desc': 'Data entry repetitivo, renombrar archivos, extraer los mismos campos — se va',
+    'c3s22.p2.title': 'El Trabajo Creativo Se Queda',
+    'c3s22.p2.desc': 'Juzgar casos raros, manejar excepciones, mejorar el sistema — sigue siendo humano',
+    'c3s22.p3.title': 'Seguimos Necesitandote',
+    'c3s22.p3.desc': 'El modelo no entiende contexto. Clasifica. Tu decides.',
+    'c3s22.p4.title': 'Tu Rol Crece',
+    'c3s22.p4.desc': 'De data entry a disenador de procesos — y eso es un ascenso, no una amenaza',
+
+    // Slide 23 - Your Team Task
+    'c3s23.title': 'Tu Tarea del Equipo',
+    'c3s23.desc': 'Esta semana, mira tu propio flujo de trabajo. Encuentra UNA cosa repetitiva que hagas todos los dias e intenta automatizarla — aunque sea pequena.',
+    'c3s23.t1': 'Identifica una tarea repetitiva que hagas todos los dias',
+    'c3s23.t2': 'Escribela paso a paso en espanol simple',
+    'c3s23.t3': 'Pidele a Claude Code o Codex que arme una primera version',
+    'c3s23.t4': 'Correla una vez, encuentra que esta mal y arreglala',
+    'c3s23.t5': 'Muestrasela a un companero y recibe feedback',
+    'c3s23.t6': 'Compartela en el chat — aprendemos mas rapido en equipo',
+
+    // Slide 24 - Infinite Possibilities
+    'c3s24.title': 'Posibilidades Infinitas',
+    'c3s24.p1': 'El Billing Packets Killer es solo un ejemplo. Cada proceso repetitivo lleno de documentos en VOC / Harp Audit es una oportunidad.',
+    'c3s24.p2': 'No necesitas ser desarrollador. Necesitas curiosidad, un problema que quieras resolver y la voluntad de iterar.',
+    'c3s24.p3': 'Empieza esta semana. Escoge una tarea. Construye algo. Aunque sea feo, aunque se rompa — sacalo e itera.',
+    'c3s24.closing': '"Hice el Billing Packets Killer en tres horas. Imaginate lo que TU puedes construir si empiezas hoy."',
   },
 };
 

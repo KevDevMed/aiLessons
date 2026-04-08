@@ -5,6 +5,7 @@ import { FileExplorer } from '../components/apps/FileExplorer/FileExplorer';
 import { Settings } from '../components/apps/Settings/Settings';
 import { PresentationApp } from '../components/apps/Presentation/PresentationApp';
 import { Presentation2App } from '../components/apps/Presentation2/Presentation2App';
+import { Presentation3App } from '../components/apps/Presentation3/Presentation3App';
 import { Terminal } from '../components/apps/Terminal/Terminal';
 import { Snake } from '../components/apps/games/Snake/Snake';
 import { Tetris } from '../components/apps/games/Tetris/Tetris';
@@ -85,6 +86,18 @@ export const APP_REGISTRY: Record<string, AppDefinition> = {
     name: 'AI Models & Tracking',
     icon: '🧠',
     component: Presentation2App,
+    defaultWidth: 960,
+    defaultHeight: 640,
+    minWidth: 500,
+    minHeight: 380,
+    singleton: true,
+    tileSize: 'wide',
+  },
+  'presentation3': {
+    id: 'presentation3',
+    name: 'Billing Packets Killer',
+    icon: '🧠',
+    component: Presentation3App,
     defaultWidth: 960,
     defaultHeight: 640,
     minWidth: 500,

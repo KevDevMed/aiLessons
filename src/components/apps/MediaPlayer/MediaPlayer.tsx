@@ -97,6 +97,16 @@ const mockTracks: Record<string, TrackInfo> = {
     gradient: '',
     youtubeId: 'wDMaJOzD_fA',
   },
+  'session-3-recording': {
+    title: 'Fine-Tuning, Open-Source y Billing Packets Killer Demo',
+    artist: '',
+    album: 'Session 3',
+    duration: '',
+    durationSeconds: 0,
+    type: 'video',
+    gradient: '',
+    youtubeId: 'yuswzkaUtq0',
+  },
 };
 
 function formatTime(seconds: number): string {

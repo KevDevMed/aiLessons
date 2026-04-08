@@ -43,6 +43,8 @@ export default function PresentationsPanel({ windowId }: AppProps) {
       appStore.launchApp('presentation');
     } else if (action === 'launch:presentation2') {
       appStore.launchApp('presentation2');
+    } else if (action === 'launch:presentation3') {
+      appStore.launchApp('presentation3');
     } else if (action.startsWith('open-notepad:')) {
       const contentKey = action.replace('open-notepad:', '');
       const content = presentationDocuments[contentKey] || '';

@@ -229,6 +229,206 @@ TOKEN PRICING EXAMPLE (Opus 4.6)
   Output: ~$150 per 1M tokens
   $200/month plan ≈ $5,000 in subsidized value`,
 
+  // ========== SESSION 3 DOCUMENTS ==========
+
+  's3-workshop-notes': `Workshop Notes: Fine-Tuning & Billing Packets Killer - Session 3
+==================================================================
+
+Key Concepts:
+- Fine-tuning = taking a general model and making it an expert on YOUR specific task
+- Open source does NOT mean free — licenses (Apache, MIT) may have revenue clauses
+- Chinese labs publish frontier models on GitHub; OpenAI publishes almost nothing
+- Local models run on 4-5 GB of RAM with no internet — your laptop is already a private AI
+- You can transfer your knowledge to a model and have it "replicate" you
+- Automation is liberation, not replacement — it removes boring work, not jobs
+
+Models & Tools Covered:
+- GLM-5 (Zhipu AI): available as open-source weights on a public GitHub repo
+- Qwen (Alibaba): multiple sizes, runs locally, competitive with GPT
+- Minimax: Chinese multimodal model — star of the Billing Packets demo
+- Ollama / LM Studio: local runners for open-source models
+- Expo + React Native: used to build the Billing Packets mobile app
+- Claude Code: the agent that wrote 100% of the app code from English prompts
+- Convex / Supabase / BetterAuth: backend-as-a-service options
+
+The Billing Packets Killer Demo:
+- Problem: team manually opens 5-15 documents per shipment (PDFs, Excels), classifies them
+  (ISF, Commercial Invoice, Customs, Packing List, Main Invoice, HBL, MBL), and extracts
+  the same fields over and over (customer, invoice number, booking number, MML)
+- Solution: a mobile app where the user picks a folder and taps "Process"
+- Under the hood: Minimax reads every file, classifies it, extracts fields into JSON
+- Output: an organized folder (renamed + numbered files) plus a summary Excel
+- Build time: 3 hours, start to finish, with Claude Code doing all the coding
+- Next steps: iterate for a week with real team feedback, then wire up CargoWise (EDI) +
+  OneDrive + email rules so the whole pipeline is hands-free
+
+Advice & Reflections:
+- Start with what you have — Minimax is cheap, local models are free, Claude Code is the
+  builder you already have
+- Think beyond the mobile app — web dashboards, CargoWise plugins, or batch API jobs may
+  fit some teams better
+- Iterate fast: Week 1 = MVP, Week 2 = complaints, Week 3 = fix, Week 4 = indispensable
+- Be aware of the dark side: fine-tuned models enable scams, deepfakes, and fake docs.
+  The best defense is understanding how they work.
+- "You can transfer your entire way of thinking to a model, and that model can replicate you.
+  In a way, you become immortal — the things you know stop dying with you."
+
+Common Pitfalls:
+- Don't assume open source = free-to-use commercially. Check the license first.
+- Don't skip the backend discussion if you need multi-user, history, or permissions.
+- Don't try to ship a perfect v1. Iterate with real users of your own team.
+- Don't train models on sensitive client data without understanding privacy implications.`,
+
+  's3-quick-reference': `Quick Reference Card - Session 3
+=================================
+
+FINE-TUNING BASICS
+  What it is: taking a general model and training it on YOUR task
+  Input: lots of labeled examples + human feedback
+  Output: a specialized model that excels at your specific use case
+  Cost: electricity if local, or a few dollars per run on hosted services
+
+OPEN-SOURCE LICENSES
+  Apache 2.0: permissive, attribution required
+  MIT: very permissive, minimal requirements
+  Custom: watch for revenue clauses (e.g., >$20M ARR triggers royalties)
+  RULE: always read the LICENSE file before deploying commercially
+
+LOCAL MODELS
+  Ollama: easiest runner — ollama.com
+  LM Studio: GUI for browsing + running models
+  Recommended small models (4-5 GB RAM):
+    - qwen2.5-coder:7b
+    - gemma3:4b
+    - llama3.2:3b
+  Once downloaded, runs entirely offline
+
+BILLING PACKETS APP STACK
+  Framework: Expo + React Native (mobile, cross-platform)
+  AI Model: Minimax (document reading + classification)
+  Builder: Claude Code (all code from English prompts)
+  Backend (optional): Convex, Supabase, or BetterAuth
+  Build time: ~3 hours for working prototype
+
+DOCUMENT TYPES CLASSIFIED
+  - Main Invoice
+  - Commercial Invoice
+  - ISF (Import Security Filing)
+  - Customs Clearance
+  - Packing List
+  - HBL (House Bill of Lading)
+  - MBL (Master Bill of Lading)
+
+FIELDS EXTRACTED
+  - Customer name
+  - Invoice number
+  - Booking number
+  - MML number
+  - HBL / MBL identifiers
+  - Confidence score
+
+CARGOWISE INTEGRATION
+  Trigger: EDI event when shipment is ready for billing
+  Destination: OneDrive / SharePoint folder
+  Watcher: app or backend job detects new folder
+  Output: processed packet emailed or posted back
+
+EMAIL AUTOMATION OPTIONS
+  Outlook Rules: auto-save attachments to folders (no code)
+  Power Automate: visual flows across Microsoft 365
+  Resend: email API for apps sending finished packets
+
+ITERATION RHYTHM
+  Week 1: Ship the ugliest possible MVP
+  Week 2: Let the team use it and complain
+  Week 3: Fix the top 3 complaints
+  Week 4: Watch them refuse to go back`,
+
+  's3-billing-packets-guide': `Billing Packets Killer — Build Guide
+=====================================
+
+WHAT WE ARE BUILDING
+A mobile app where anyone on the Billing Packets team can point at a folder of shipment
+documents and receive a fully organized billing packet in under a minute. The app reads
+each document, classifies it, extracts key fields, and assembles a final packet.
+
+THE PAIN POINT
+Today, the Billing Packets team manually:
+  1. Downloads a shipment's documents from CargoWise
+  2. Opens each PDF / Excel to figure out what it is
+  3. Renames files with a standard convention
+  4. Copies the customer name, invoice number, booking, MML into a template
+  5. Assembles the final packet
+  6. Sends it to the client
+
+This takes 30-60 minutes per shipment. We want to get it under 5.
+
+THE FLOW
+  User → opens app
+  User → picks shipment folder (from CargoWise download)
+  App → sends each file to Minimax
+  Minimax → classifies + extracts fields
+  App → assembles organized packet + summary Excel
+  User → reviews, fixes anything weird, taps "Send"
+
+THE STACK
+  Mobile: Expo + React Native (1 codebase, iOS + Android + Mac simulator)
+  Model: Minimax (Chinese multimodal, cheap, great at PDFs + Excels)
+  Agent: Claude Code (wrote all the code from English prompts)
+  Backend (optional): Convex, Supabase, or BetterAuth for multi-user + history
+
+HIGH-LEVEL IMPLEMENTATION STEPS
+  1. npx create-expo-app billing-packets
+  2. Ask Claude Code to scaffold the screens: Login → Folder Picker → Processing → Review
+  3. Integrate the Minimax API (or swap for Qwen via OpenRouter for cheaper)
+  4. Prompt the model with each file + a short taxonomy of the 7 document types
+  5. Store extracted JSON in state; render the review screen
+  6. On "Send", generate the organized folder + summary Excel
+  7. Optional: wire Resend or a backend to email the packet to the client
+
+DOCUMENT TAXONOMY PROMPT (EXAMPLE)
+  You are an assistant for a logistics billing team. Classify the attached document as
+  exactly one of: main_invoice, commercial_invoice, isf, customs_clearance, packing_list,
+  hbl, mbl, unknown. Then extract these fields if present: customer, invoice_number,
+  booking_number, mml_number, hbl_number, mbl_number. Return JSON only.
+
+INTEGRATION: CARGOWISE + EDI
+  CargoWise triggers EDI events when a shipment is ready for billing. Configure one to
+  drop the shipment documents into a OneDrive / SharePoint folder. A backend job (or the
+  app) watches that folder and auto-processes anything new. The finished packet goes
+  back out via email or gets posted to a shared drive.
+
+INTEGRATION: EMAIL AUTOMATION
+  - Outlook rules: auto-save email attachments to specific folders
+  - Power Automate: visually wire email → folder → app → reply
+  - Resend (or any email API): let the app send the packet with one tap
+
+BACKEND CHOICES
+  Convex: TypeScript-first, real-time sync, good DX, great for multi-user apps
+  Supabase: Postgres + auth + storage + row-level security
+  BetterAuth: auth only, bolted onto any existing backend
+  No backend: for a single-user demo, just run locally — simpler to start
+
+SECURITY NOTES
+  - Do NOT train models on production customer data without legal sign-off
+  - Use storage with encryption at rest + in transit
+  - Audit who can access which shipments
+  - For sensitive docs, prefer local models (Qwen, Minimax self-hosted)
+  - Always set spending limits on any hosted model API key
+
+ITERATION PLAN
+  Day 1: scaffold the app, get classification working on 5 sample shipments
+  Day 2: extraction + JSON output
+  Day 3: packet assembly + Excel generation
+  Week 2: real team trial, collect feedback
+  Week 3: fix the top 3 complaints
+  Week 4: CargoWise + email integration
+  Week 5+: it becomes the tool they cannot live without
+
+GOLDEN RULE
+  Ship the ugliest possible v1 this week. You learn more from one real user than from
+  three weeks of planning.`,
+
   's2-model-comparison': `AI Model Comparison Guide - Session 2
 ======================================
 
@@ -390,6 +590,56 @@ export const presentationFolders: PresentationFolder[] = [
         icon: '🎬',
         description: 'Modelos de AI y Tracking Killer Demo',
         action: 'open-media:session-2-recording',
+      },
+    ],
+  },
+  {
+    id: 'billing-packets-killer',
+    name: 'Billing Packets Killer',
+    icon: '📦',
+    color: '#B569FF',
+    resources: [
+      {
+        name: 'Billing Packets Killer Presentation',
+        type: 'presentation',
+        icon: '🧠',
+        description: '24 slides covering fine-tuning, open-source models, and the Billing Packets mobile app demo',
+        action: 'launch:presentation3',
+      },
+      {
+        name: 'Workshop Notes',
+        type: 'document',
+        icon: '📝',
+        description: 'Key concepts, models, tools, and advice from Session 3',
+        action: 'open-notepad:s3-workshop-notes',
+      },
+      {
+        name: 'Quick Reference Card',
+        type: 'document',
+        icon: '📄',
+        description: 'Commands, licenses, document types, and stack at a glance',
+        action: 'open-notepad:s3-quick-reference',
+      },
+      {
+        name: 'Billing Packets Build Guide',
+        type: 'document',
+        icon: '📋',
+        description: 'Step-by-step guide to building the Billing Packets Killer app',
+        action: 'open-notepad:s3-billing-packets-guide',
+      },
+      {
+        name: 'Terminal',
+        type: 'tool',
+        icon: '💻',
+        description: 'Practice commands in the terminal',
+        action: 'launch:terminal',
+      },
+      {
+        name: 'Session Recording',
+        type: 'tool',
+        icon: '🎬',
+        description: 'Fine-Tuning, Open-Source Models y Billing Packets Killer Demo',
+        action: 'open-media:session-3-recording',
       },
     ],
   },
