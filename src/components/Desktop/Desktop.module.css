@@ -19,3 +19,26 @@
   right: 0;
   bottom: 0;
 }
+
+.widgetLayer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+}
+
+.widgetLayer > * {
+  pointer-events: auto;
+}
+
+.widgetStack {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  z-index: 5;
+}

@@ -11,6 +11,7 @@
 import type * as crons from "../crons.js";
 import type * as leaderboards from "../leaderboards.js";
 import type * as news from "../news.js";
+import type * as sessionFeedback from "../sessionFeedback.js";
 
 import type {
   ApiFromModules,
@@ -22,6 +23,7 @@ declare const fullApi: ApiFromModules<{
   crons: typeof crons;
   leaderboards: typeof leaderboards;
   news: typeof news;
+  sessionFeedback: typeof sessionFeedback;
 }>;
 
 /**

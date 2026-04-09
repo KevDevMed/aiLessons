@@ -6,6 +6,7 @@ import { Settings } from '../components/apps/Settings/Settings';
 import { PresentationApp } from '../components/apps/Presentation/PresentationApp';
 import { Presentation2App } from '../components/apps/Presentation2/Presentation2App';
 import { Presentation3App } from '../components/apps/Presentation3/Presentation3App';
+import { Presentation4App } from '../components/apps/Presentation4/Presentation4App';
 import { Terminal } from '../components/apps/Terminal/Terminal';
 import { Snake } from '../components/apps/games/Snake/Snake';
 import { Tetris } from '../components/apps/games/Tetris/Tetris';
@@ -20,6 +21,7 @@ import { MediaPlayer } from '../components/apps/MediaPlayer/MediaPlayer';
 import PresentationsPanel from '../components/PresentationsPanel/PresentationsPanel';
 import { RecycleBin } from '../components/apps/RecycleBin/RecycleBin';
 import { NewsApp } from '../components/apps/News/NewsApp';
+import { Attendance } from '../components/apps/Attendance/Attendance';
 
 export const APP_REGISTRY: Record<string, AppDefinition> = {
   'file-explorer': {
@@ -101,6 +103,19 @@ export const APP_REGISTRY: Record<string, AppDefinition> = {
     name: 'Billing Packets Killer',
     icon: '🧠',
     component: Presentation3App,
+    defaultWidth: 960,
+    defaultHeight: 640,
+    minWidth: 500,
+    minHeight: 380,
+    singleton: true,
+    tileSize: 'wide',
+    hiddenFromDesktop: true,
+  },
+  'presentation4': {
+    id: 'presentation4',
+    name: 'Mental Maps & Loops',
+    icon: '🧠',
+    component: Presentation4App,
     defaultWidth: 960,
     defaultHeight: 640,
     minWidth: 500,
@@ -261,6 +276,19 @@ export const APP_REGISTRY: Record<string, AppDefinition> = {
     minHeight: 300,
     singleton: true,
     tileSize: 'medium',
+  },
+  'attendance': {
+    id: 'attendance',
+    name: 'Attendance',
+    icon: '📊',
+    component: Attendance,
+    defaultWidth: 820,
+    defaultHeight: 580,
+    minWidth: 500,
+    minHeight: 380,
+    singleton: true,
+    tileSize: 'medium',
+    hiddenFromDesktop: true,
   },
   'recycle-bin': {
     id: 'recycle-bin',

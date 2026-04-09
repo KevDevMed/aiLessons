@@ -1,0 +1,153 @@
+.widget {
+  position: relative;
+  width: 288px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 12px 14px;
+  background: rgba(20, 20, 30, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 10px;
+  backdrop-filter: blur(14px) saturate(1.2);
+  -webkit-backdrop-filter: blur(14px) saturate(1.2);
+  box-shadow:
+    0 8px 24px rgba(0, 0, 0, 0.45),
+    0 1px 0 rgba(255, 255, 255, 0.06) inset;
+  color: var(--win-text-primary);
+  font-family: var(--win-font);
+  text-align: left;
+  transition: border-color var(--win-transition-fast),
+    background var(--win-transition-fast);
+}
+
+.widget:hover {
+  background: rgba(28, 28, 42, 0.6);
+  border-color: rgba(66, 156, 227, 0.35);
+}
+
+.header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.titleGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+
+.title {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+  color: var(--win-text-primary);
+}
+
+.subtitle {
+  font-size: 10px;
+  color: var(--win-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+.question {
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.35;
+  color: var(--win-text-primary);
+  margin-top: 2px;
+}
+
+.options {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.option {
+  width: 100%;
+  text-align: left;
+  padding: 8px 10px;
+  font-family: var(--win-font);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--win-text-primary);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background var(--win-transition-fast),
+    border-color var(--win-transition-fast),
+    transform var(--win-transition-fast);
+}
+
+.option:hover:not(:disabled) {
+  background: rgba(66, 156, 227, 0.2);
+  border-color: var(--win-accent-light);
+  transform: translateX(1px);
+}
+
+.option:active:not(:disabled) {
+  transform: translateX(0);
+  background: rgba(66, 156, 227, 0.3);
+}
+
+.option:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+
+.skeleton {
+  height: 140px;
+  border-radius: 8px;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.04) 0%,
+    rgba(255, 255, 255, 0.08) 50%,
+    rgba(255, 255, 255, 0.04) 100%
+  );
+  background-size: 200% 100%;
+  animation: skeletonShimmer 1.4s ease-in-out infinite;
+}
+
+@keyframes skeletonShimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+.doneState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 4px;
+  padding: 14px 4px 6px;
+}
+
+.doneTitle {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--win-accent-light);
+  letter-spacing: 0.2px;
+}
+
+.doneMessage {
+  font-size: 11px;
+  color: var(--win-text-secondary);
+  line-height: 1.4;
+}
+
+/* Hide on very small screens so it doesn't cover icons. Matches the rule in
+ * AttendanceTrendWidget.module.css. */
+@media (max-width: 640px) {
+  .widget {
+    display: none;
+  }
+}

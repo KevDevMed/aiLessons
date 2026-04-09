@@ -628,6 +628,134 @@ const dict: Record<Lang, Record<string, string>> = {
     'c3s24.p2': 'You do not need to be a developer. You need curiosity, a problem you want to solve, and the willingness to iterate.',
     'c3s24.p3': 'Start this week. Pick one task. Build something. Even if it is ugly, even if it breaks — ship it and iterate.',
     'c3s24.closing': '"I built the Billing Packets Killer in three hours. Imagine what YOU can build if you start today."',
+
+    // ========== SESSION 4: MENTAL MAPS & LOOPS ==========
+
+    // Slide 1 - Title
+    'c4s1.title': 'Mental Maps & Loops',
+    'c4s1.subtitle': 'From Excalidraw diagrams to running automations — the thinking tool behind every good skill',
+
+    // Slide 2 - Session 3 Recap
+    'c4s2.title': 'Where We Left Off',
+    'c4s2.desc': 'Last session we built the Billing Packets Killer — a mobile app that reads shipment documents and assembles a billing packet in minutes. Today we go one level deeper: how to THINK about an automation before we write a single prompt.',
+    'c4s2.p1.title': 'Fine-Tuning',
+    'c4s2.p1.desc': 'We saw how to specialize a general model on a domain with examples and feedback',
+    'c4s2.p2.title': 'Open-Source Reality',
+    'c4s2.p2.desc': 'Chinese frontier models on GitHub — cheap, fast, and good enough for production',
+    'c4s2.p3.title': 'Billing Packets App',
+    'c4s2.p3.desc': 'Three hours from idea to working prototype with Expo + Minimax + Claude Code',
+
+    // Slide 3 - Agenda
+    'c4s3.title': 'Today\'s Agenda',
+    'c4s3.i1': 'The problem with prompting straight from your head',
+    'c4s3.i2': 'Excalidraw — a whiteboard the AI can read',
+    'c4s3.i3': 'Translating a diagram into a structured prompt',
+    'c4s3.i4': 'Demo 1: building /mejor-chiste, a 4-step comedy pipeline',
+    'c4s3.i5': 'The delegation pattern — different models for different roles',
+    'c4s3.i6': '/loop — turning a skill into a recurring automation',
+    'c4s3.i7': 'Demo 2: the arKiller loop — monitoring AR every few hours',
+    'c4s3.i8': 'Your homework: map ONE workflow and loop it',
+
+    // Slide 4 - The Thinking Problem
+    'c4s4.title': 'The Thinking Problem',
+    'c4s4.desc': 'You cannot prompt what you cannot see. When you try to write a prompt straight from your head, you forget steps, skip decisions, and end up with a vague wall of text. The model does its best, but the output is as blurry as the thinking behind it.',
+    'c4s4.key': 'A diagram forces you to name every box and every arrow. Once you can see the whole flow, the prompt practically writes itself — because the structure is already there.',
+
+    // Slide 5 - Excalidraw: Your Whiteboard for AI
+    'c4s5.title': 'Excalidraw: Your Whiteboard for AI',
+    'c4s5.desc': 'Excalidraw is a free, browser-based whiteboard. No install, no login, works on any device. You sketch boxes, arrows, and labels the way you would on paper — then use the diagram as the skeleton of your prompt.',
+    'c4s5.p1.title': 'Free & Instant',
+    'c4s5.p1.desc': 'Open excalidraw.com and start drawing. No account needed, no data sent anywhere.',
+    'c4s5.p2.title': 'Copy-Pasteable',
+    'c4s5.p2.desc': 'Export as PNG, SVG, or plain text. Paste into the chat and the model understands it.',
+    'c4s5.p3.title': 'Forces Clarity',
+    'c4s5.p3.desc': 'If you cannot draw a step, you cannot prompt it. The blank boxes expose the gaps in your thinking.',
+
+    // Slide 6 - From Diagram to Prompt
+    'c4s6.title': 'From Diagram to Prompt',
+    'c4s6.desc': 'Every well-built skill starts the same way. Draw the flow first, then translate each box into a prompt instruction. Each arrow becomes a dependency, each label becomes a parameter.',
+    'c4s6.s1': 'Open Excalidraw and draw the end-to-end flow as boxes and arrows',
+    'c4s6.s2': 'Label each box with the action it performs and what it produces',
+    'c4s6.s3': 'Paste the diagram into Claude Code and ask it to draft a skill from the flow',
+    'c4s6.s4': 'Review, test, iterate — the diagram becomes the spec, the skill becomes the result',
+
+    // Slide 7 - Demo 1: /mejor-chiste
+    'c4s7.title': 'Demo 1 — /mejor-chiste',
+    'c4s7.desc': 'A 4-step comedy pipeline. Instead of asking one model to write a joke, we delegate to different models for different roles: a generator, a critic, a rewriter, and a judge. The winning joke is appended to a training log we review every morning.',
+
+    // Slide 8 - The Delegation Pattern
+    'c4s8.title': 'The Delegation Pattern',
+    'c4s8.desc': 'The same principle that makes teams work also applies to AI. Pick the right model for each role. Cheap and fast for brainstorming, careful and structured for critique, expensive and thoughtful for final decisions.',
+    'c4s8.p1.title': 'Haiku — The Generator',
+    'c4s8.p1.desc': 'Fast, cheap, creative. Perfect for brainstorming raw ideas and rewriting with feedback.',
+    'c4s8.p2.title': 'Sonnet — The Critic',
+    'c4s8.p2.desc': 'Balanced reasoning. Diagnoses what is wrong without overthinking it. The reviewer role.',
+    'c4s8.p3.title': 'Opus — The Judge',
+    'c4s8.p3.desc': 'Expensive but deep. Use it sparingly for the highest-stakes decision in the pipeline.',
+
+    // Slide 9 - /loop
+    'c4s9.title': '/loop — Recurring Automation',
+    'c4s9.desc': 'A skill is a one-shot action. A loop is a skill that runs on a schedule. Once you have a working skill, wrap it in /loop with an interval and it keeps running by itself — as long as your computer stays awake and the session is alive.',
+
+    // Slide 10 - Demo 2: arKiller Loop
+    'c4s10.title': 'Demo 2 — The arKiller Loop',
+    'c4s10.desc': 'arKiller is the accounts-receivable dashboard on my Desktop. Running it manually once a week is painful — so I turned its daily checks into a loop. Every few hours, the agent reads the latest AR snapshot, updates the board, and flags what needs attention.',
+    'c4s10.s1': 'Read the latest Excel aging snapshot from the data folder',
+    'c4s10.s2': 'Compare against the previous snapshot and flag any account that aged into a new bucket',
+    'c4s10.s3': 'Post the new statuses and open tasks to the arKiller board',
+    'c4s10.s4': 'Append a summary line to the log so I can scan the history at a glance',
+
+    // Slide 11 - Your Homework
+    'c4s11.title': 'Your Homework',
+    'c4s11.desc': 'Pick one workflow you do every day. Open Excalidraw. Draw the boxes. Translate it into a skill. Then wrap it in a loop and let it run while you sleep.',
+    'c4s11.t1': 'Pick ONE repetitive task — the smallest one you can think of',
+    'c4s11.t2': 'Open excalidraw.com and draw the flow as boxes and arrows',
+    'c4s11.t3': 'Paste the diagram into Claude Code and ask for a skill',
+    'c4s11.t4': 'Test it once. Fix what is wrong. Test again.',
+    'c4s11.t5': 'Wrap it in /loop with an interval that makes sense for your task',
+
+    // Slide 12 - Closing
+    'c4s12.title': 'You Already Know Enough',
+    'c4s12.desc': 'The hardest part is not the prompting. It is seeing the workflow clearly enough to describe it. Every box you draw is a step you used to do without thinking — and every step you used to do without thinking is now one more thing the machine can do for you.',
+    'c4s12.closing': '"If you can draw it, you can prompt it. If you can prompt it, you can loop it. If you can loop it, you own your time back."',
+
+    // Session Feedback Widget
+    'feedback.title': 'Your Feedback',
+    'feedback.subtitle': 'Help me improve',
+    'feedback.progress': 'Question {current} of {total}',
+    'feedback.loading': 'Loading…',
+    'feedback.thanks': 'Thanks!',
+    'feedback.thanksMessage': 'Your feedback shapes how I teach.',
+    'feedback.q1': 'How clear is the overall content?',
+    'feedback.q1.o1': 'Very clear',
+    'feedback.q1.o2': 'Clear',
+    'feedback.q1.o3': 'Neutral',
+    'feedback.q1.o4': 'Unclear',
+    'feedback.q1.o5': 'Very unclear',
+    'feedback.q2': 'How is the overall pacing?',
+    'feedback.q2.o1': 'Too slow',
+    'feedback.q2.o2': 'A bit slow',
+    'feedback.q2.o3': 'Just right',
+    'feedback.q2.o4': 'A bit fast',
+    'feedback.q2.o5': 'Too fast',
+    'feedback.q3': 'How engaging is the teaching style?',
+    'feedback.q3.o1': 'Very engaging',
+    'feedback.q3.o2': 'Engaging',
+    'feedback.q3.o3': 'Neutral',
+    'feedback.q3.o4': 'Not very',
+    'feedback.q3.o5': 'Boring',
+    'feedback.q4': 'How useful is the material for your work?',
+    'feedback.q4.o1': 'Extremely',
+    'feedback.q4.o2': 'Very',
+    'feedback.q4.o3': 'Somewhat',
+    'feedback.q4.o4': 'Not very',
+    'feedback.q4.o5': 'Not at all',
+    'feedback.q5': 'Would you recommend these sessions?',
+    'feedback.q5.o1': 'Definitely',
+    'feedback.q5.o2': 'Probably',
+    'feedback.q5.o3': 'Maybe',
+    'feedback.q5.o4': 'Probably not',
+    'feedback.q5.o5': 'Definitely not',
   },
   es: {
     'os.title': 'SecondSession',
@@ -1254,6 +1382,134 @@ const dict: Record<Lang, Record<string, string>> = {
     'c3s24.p2': 'No necesitas ser desarrollador. Necesitas curiosidad, un problema que quieras resolver y la voluntad de iterar.',
     'c3s24.p3': 'Empieza esta semana. Escoge una tarea. Construye algo. Aunque sea feo, aunque se rompa — sacalo e itera.',
     'c3s24.closing': '"Hice el Billing Packets Killer en tres horas. Imaginate lo que TU puedes construir si empiezas hoy."',
+
+    // ========== SESSION 4: MAPAS MENTALES Y LOOPS ==========
+
+    // Slide 1 - Title
+    'c4s1.title': 'Mapas Mentales y Loops',
+    'c4s1.subtitle': 'Desde diagramas de Excalidraw hasta automatizaciones corriendo — la herramienta de pensamiento detras de cada buena skill',
+
+    // Slide 2 - Session 3 Recap
+    'c4s2.title': 'Donde Lo Dejamos',
+    'c4s2.desc': 'La sesion pasada construimos el Billing Packets Killer — una app movil que lee documentos de embarque y arma el paquete de facturacion en minutos. Hoy vamos un nivel mas profundo: como PENSAR una automatizacion antes de escribir un solo prompt.',
+    'c4s2.p1.title': 'Fine-Tuning',
+    'c4s2.p1.desc': 'Vimos como especializar un modelo general en un dominio con ejemplos y feedback',
+    'c4s2.p2.title': 'Realidad Open-Source',
+    'c4s2.p2.desc': 'Modelos chinos de frontera en GitHub — baratos, rapidos y suficientemente buenos para produccion',
+    'c4s2.p3.title': 'Billing Packets App',
+    'c4s2.p3.desc': 'Tres horas de la idea a prototipo funcional con Expo + Minimax + Claude Code',
+
+    // Slide 3 - Agenda
+    'c4s3.title': 'Agenda de Hoy',
+    'c4s3.i1': 'El problema de promptear directo desde la cabeza',
+    'c4s3.i2': 'Excalidraw — un pizarron que la IA puede leer',
+    'c4s3.i3': 'Traducir un diagrama en un prompt estructurado',
+    'c4s3.i4': 'Demo 1: construir /mejor-chiste, un pipeline de comedia de 4 pasos',
+    'c4s3.i5': 'El patron de delegacion — modelos distintos para roles distintos',
+    'c4s3.i6': '/loop — convertir una skill en una automatizacion recurrente',
+    'c4s3.i7': 'Demo 2: el loop de arKiller — monitorear AR cada pocas horas',
+    'c4s3.i8': 'Tu tarea: mapea UN flujo y ponelo en loop',
+
+    // Slide 4 - The Thinking Problem
+    'c4s4.title': 'El Problema del Pensamiento',
+    'c4s4.desc': 'No podes promptear lo que no podes ver. Cuando tratas de escribir un prompt directo desde la cabeza, te olvidas pasos, saltas decisiones y terminas con un muro de texto vago. El modelo hace lo mejor que puede, pero la salida es tan borrosa como el pensamiento detras.',
+    'c4s4.key': 'Un diagrama te obliga a nombrar cada caja y cada flecha. Una vez que ves el flujo completo, el prompt practicamente se escribe solo — porque la estructura ya esta ahi.',
+
+    // Slide 5 - Excalidraw: Your Whiteboard for AI
+    'c4s5.title': 'Excalidraw: Tu Pizarron para IA',
+    'c4s5.desc': 'Excalidraw es un pizarron gratuito que corre en el navegador. Sin instalacion, sin login, funciona en cualquier dispositivo. Dibujas cajas, flechas y etiquetas como si fuera papel — y despues usas el diagrama como esqueleto del prompt.',
+    'c4s5.p1.title': 'Gratis e Instantaneo',
+    'c4s5.p1.desc': 'Abre excalidraw.com y empieza a dibujar. Sin cuenta, sin datos enviados a ningun lado.',
+    'c4s5.p2.title': 'Copia-Pegable',
+    'c4s5.p2.desc': 'Exporta como PNG, SVG o texto plano. Lo pegas en el chat y el modelo lo entiende.',
+    'c4s5.p3.title': 'Fuerza Claridad',
+    'c4s5.p3.desc': 'Si no podes dibujar un paso, no podes promptearlo. Las cajas vacias exponen los huecos en tu pensamiento.',
+
+    // Slide 6 - From Diagram to Prompt
+    'c4s6.title': 'Del Diagrama al Prompt',
+    'c4s6.desc': 'Cada skill bien construida empieza igual. Dibuja el flujo primero, despues traduce cada caja en una instruccion del prompt. Cada flecha es una dependencia, cada etiqueta es un parametro.',
+    'c4s6.s1': 'Abre Excalidraw y dibuja el flujo de principio a fin con cajas y flechas',
+    'c4s6.s2': 'Etiqueta cada caja con la accion que ejecuta y lo que produce',
+    'c4s6.s3': 'Pega el diagrama en Claude Code y pedile que arme una skill desde el flujo',
+    'c4s6.s4': 'Revisa, prueba, itera — el diagrama es la especificacion, la skill es el resultado',
+
+    // Slide 7 - Demo 1: /mejor-chiste
+    'c4s7.title': 'Demo 1 — /mejor-chiste',
+    'c4s7.desc': 'Un pipeline de comedia de 4 pasos. En lugar de pedirle a un solo modelo que escriba un chiste, delegamos a modelos distintos para roles distintos: un generador, un critico, un reescritor y un juez. El chiste ganador se agrega a un log de entrenamiento que reviso cada manana.',
+
+    // Slide 8 - The Delegation Pattern
+    'c4s8.title': 'El Patron de Delegacion',
+    'c4s8.desc': 'El mismo principio que hace funcionar a un equipo tambien aplica a la IA. Escoge el modelo correcto para cada rol. Barato y rapido para tormenta de ideas, cuidadoso y estructurado para critica, caro y reflexivo para decisiones finales.',
+    'c4s8.p1.title': 'Haiku — El Generador',
+    'c4s8.p1.desc': 'Rapido, barato, creativo. Perfecto para tormenta de ideas en crudo y reescribir con feedback.',
+    'c4s8.p2.title': 'Sonnet — El Critico',
+    'c4s8.p2.desc': 'Razonamiento balanceado. Diagnostica que esta mal sin pensarlo de mas. El rol de revisor.',
+    'c4s8.p3.title': 'Opus — El Juez',
+    'c4s8.p3.desc': 'Caro pero profundo. Usalo con moderacion para la decision mas importante del pipeline.',
+
+    // Slide 9 - /loop
+    'c4s9.title': '/loop — Automatizacion Recurrente',
+    'c4s9.desc': 'Una skill es una accion de una sola vez. Un loop es una skill que corre en un horario. Una vez que tenes una skill que funciona, envolvela en /loop con un intervalo y se ejecuta sola — mientras la computadora este despierta y la sesion viva.',
+
+    // Slide 10 - Demo 2: arKiller Loop
+    'c4s10.title': 'Demo 2 — El Loop de arKiller',
+    'c4s10.desc': 'arKiller es el dashboard de cuentas por cobrar en mi Desktop. Correrlo manualmente una vez por semana es doloroso — asi que converti los chequeos diarios en un loop. Cada pocas horas, el agente lee el ultimo snapshot de AR, actualiza el board y marca lo que necesita atencion.',
+    'c4s10.s1': 'Lee el ultimo snapshot de aging en Excel desde la carpeta de datos',
+    'c4s10.s2': 'Compara contra el snapshot anterior y marca cualquier cuenta que avanzo a un bucket nuevo',
+    'c4s10.s3': 'Publica los estados nuevos y las tareas abiertas en el board de arKiller',
+    'c4s10.s4': 'Agrega una linea de resumen al log para escanear la historia de un vistazo',
+
+    // Slide 11 - Your Homework
+    'c4s11.title': 'Tu Tarea',
+    'c4s11.desc': 'Escoge un flujo que hagas todos los dias. Abre Excalidraw. Dibuja las cajas. Traducilo en una skill. Despues envolvela en un loop y dejala correr mientras dormis.',
+    'c4s11.t1': 'Escoge UNA tarea repetitiva — la mas chica que se te ocurra',
+    'c4s11.t2': 'Abre excalidraw.com y dibuja el flujo como cajas y flechas',
+    'c4s11.t3': 'Pega el diagrama en Claude Code y pedi una skill',
+    'c4s11.t4': 'Probala una vez. Arregla lo que esta mal. Probala de nuevo.',
+    'c4s11.t5': 'Envolvela en /loop con un intervalo que tenga sentido para tu tarea',
+
+    // Slide 12 - Closing
+    'c4s12.title': 'Ya Sabes Suficiente',
+    'c4s12.desc': 'La parte mas dificil no es el prompting. Es ver el flujo con suficiente claridad para describirlo. Cada caja que dibujas es un paso que antes hacias sin pensar — y cada paso que hacias sin pensar es una cosa mas que la maquina puede hacer por vos.',
+    'c4s12.closing': '"Si lo podes dibujar, lo podes promptear. Si lo podes promptear, lo podes poner en loop. Si lo podes poner en loop, recuperas tu tiempo."',
+
+    // Session Feedback Widget
+    'feedback.title': 'Tu Feedback',
+    'feedback.subtitle': 'Ayudame a mejorar',
+    'feedback.progress': 'Pregunta {current} de {total}',
+    'feedback.loading': 'Cargando…',
+    'feedback.thanks': 'Gracias!',
+    'feedback.thanksMessage': 'Tu feedback da forma a como ensenio.',
+    'feedback.q1': 'Que tan claro es el contenido en general?',
+    'feedback.q1.o1': 'Muy claro',
+    'feedback.q1.o2': 'Claro',
+    'feedback.q1.o3': 'Neutral',
+    'feedback.q1.o4': 'Poco claro',
+    'feedback.q1.o5': 'Nada claro',
+    'feedback.q2': 'Como es el ritmo en general?',
+    'feedback.q2.o1': 'Muy lento',
+    'feedback.q2.o2': 'Algo lento',
+    'feedback.q2.o3': 'Justo',
+    'feedback.q2.o4': 'Algo rapido',
+    'feedback.q2.o5': 'Muy rapido',
+    'feedback.q3': 'Que tan entretenido es el estilo de ensenianza?',
+    'feedback.q3.o1': 'Muy entretenido',
+    'feedback.q3.o2': 'Entretenido',
+    'feedback.q3.o3': 'Neutral',
+    'feedback.q3.o4': 'Poco',
+    'feedback.q3.o5': 'Aburrido',
+    'feedback.q4': 'Que tan util es el material para tu trabajo?',
+    'feedback.q4.o1': 'Muchisimo',
+    'feedback.q4.o2': 'Mucho',
+    'feedback.q4.o3': 'Algo',
+    'feedback.q4.o4': 'Poco',
+    'feedback.q4.o5': 'Nada',
+    'feedback.q5': 'Recomendarias estas sesiones?',
+    'feedback.q5.o1': 'Sin duda',
+    'feedback.q5.o2': 'Probablemente',
+    'feedback.q5.o3': 'Tal vez',
+    'feedback.q5.o4': 'Probablemente no',
+    'feedback.q5.o5': 'Para nada',
   },
 };
 

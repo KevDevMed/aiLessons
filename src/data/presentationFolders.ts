@@ -429,6 +429,265 @@ GOLDEN RULE
   Ship the ugliest possible v1 this week. You learn more from one real user than from
   three weeks of planning.`,
 
+  // ========== SESSION 4 DOCUMENTS ==========
+
+  's4-workshop-notes': `Workshop Notes: Mental Maps & Loops - Session 4
+================================================
+
+Key Concepts:
+- A diagram forces structure. If you cannot draw the steps, your prompt will be vague.
+- Excalidraw is free, browser-based, and AI-friendly — no install, no login.
+- The best skills start as a whiteboard drawing, not as a paragraph of text.
+- Delegation pattern: pick the right model for each step (Haiku generator, Sonnet critic, Opus judge).
+- /loop turns a one-shot skill into a recurring automation — the skill runs every day while you sleep.
+
+Today's Demos:
+- /mejor-chiste — a 4-step comedy pipeline:
+    1. Haiku generates 5 absurd jokes (fast, cheap, creative)
+    2. Sonnet critiques them on timing, clarity, and wording
+    3. Haiku rewrites them with the feedback
+    4. Opus picks the single best one
+    5. Winner is appended to /Users/kevinmedina/jokes.md
+- arKiller Loop — daily check on the accounts-receivable board:
+    - Reads the latest Excel aging snapshot from the data folder
+    - Compares against the previous snapshot
+    - Flags accounts that aged into a new bucket
+    - Posts updates to the arKiller board and appends a summary line to the log
+
+The Workflow (Diagram → Prompt → Skill → Loop):
+1. Open excalidraw.com — draw the end-to-end flow as boxes and arrows
+2. Label each box with what it does and what it outputs
+3. Export the diagram (PNG, SVG, or text) and paste it into Claude Code
+4. Ask Claude Code to turn the diagram into a slash command
+5. Test the skill once, fix issues, test again
+6. When it works, wrap it in /loop with an interval that makes sense
+7. Let it run — check the log the next morning
+
+Why This Matters:
+- You already know your daily work — the hard part is SEEING it clearly
+- Once you can see the flow, the prompt practically writes itself
+- Automation is liberation: the boring steps disappear, the creative ones stay
+- Start small. A 5-step skill that runs every day beats a 50-step skill you never ship.
+
+Advice:
+- Resist the urge to draw the "perfect" diagram. Draw an ugly one, ship the skill, iterate.
+- Use cheap models for high-volume work and expensive models only for final decisions.
+- Put the winning output in a log file you review every morning — that is how you learn from your own automations.
+- If a skill fails, look at the diagram first. Nine times out of ten the gap is in the thinking, not in the prompt.
+
+Common Pitfalls:
+- Skipping the diagram because "it's obvious". If it were obvious, you would not need the skill.
+- Using Opus for everything. It is slow and expensive. Reserve it for the highest-stakes step.
+- Forgetting to check the log. The loop is only valuable if someone reads the output.
+- Running loops on a laptop that sleeps. Keep the computer awake or schedule for work hours only.`,
+
+  's4-quick-reference': `Quick Reference Card - Session 4
+=================================
+
+EXCALIDRAW
+  Website: excalidraw.com
+  Cost: Free, no account needed
+  Export: PNG, SVG, or plain text
+  Use it for: drawing flows before prompting
+
+THE WORKFLOW
+  1. Draw the flow in Excalidraw
+  2. Export or screenshot the diagram
+  3. Paste into Claude Code
+  4. Ask for a slash command based on the flow
+  5. Test and iterate
+  6. Wrap in /loop when stable
+
+DELEGATION PATTERN (Agent tool)
+  Parameters:
+    - subagent_type: "general-purpose"
+    - model:         "haiku" | "sonnet" | "opus"
+    - description:   short label
+    - prompt:        the actual task
+
+  Pick the right model for each role:
+    Haiku  → fast, cheap, creative (generation, rewriting)
+    Sonnet → balanced critique and analysis (review, diagnosis)
+    Opus   → the final high-stakes decision (selection, judgment)
+
+/loop COMMAND
+  Usage:    /loop <interval> /<skill-name>
+  Examples: /loop 24h /mejor-chiste
+            /loop 6h /check-arKiller-snapshot
+            /loop 30m /sync-inbox
+  Session lifetime: ~7 days
+  Requirement: computer must stay awake
+
+STOPPING A LOOP
+  - Exit the Claude Code session that owns the loop
+  - Or: start a new session and ask Claude Code to cancel it
+
+LOGGING WINNERS / OUTPUTS
+  Append results to a markdown file you review each morning
+  Example path: /Users/kevinmedina/jokes.md
+  Pattern (bash):
+    printf '\\n## %s\\n\\n%s\\n' "$(date '+%Y-%m-%d')" "<content>" >> path/to/log.md
+
+SKILLS CREATED IN SESSION
+  /mejor-chiste — 4-step Spanish absurdist comedy pipeline
+  arKiller loop — scheduled AR snapshot monitor
+
+KEY FILES FROM TODAY
+  /Users/kevinmedina/.claude/commands/mejor-chiste.md  (the skill definition)
+  /Users/kevinmedina/jokes.md                           (the training log)
+  /Users/kevinmedina/Desktop/arKiller/                  (the AR monitor project)
+
+NEXT SESSION TOPICS
+  - Chaining multiple skills together
+  - Long-running agents and progress monitoring
+  - When NOT to use a loop (interactive workflows, human-in-the-loop decisions)`,
+
+  's4-mejor-chiste-command': `You are an orchestrator running a 4-step comedy pipeline. Goal: produce **one** excellent absurd/surrealist joke in Spanish (Les Luthiers style — broken logic, impossible premises played straight, unexpected turns) and append it to a training log the user reviews to practice telling jokes.
+
+Stay lightweight. Delegate work to sub-agents using the \`Agent\` tool with the \`model\` parameter to pick Haiku, Sonnet, or Opus. Each sub-agent runs in isolated context. Do NOT do any of the creative work yourself — your only job is to orchestrate, parse, and log.
+
+Before starting, note the absolute path \`/Users/kevinmedina/jokes.md\` — this is the training log.
+
+---
+
+## Step 1 — Haiku generates 5 jokes
+
+Invoke the \`Agent\` tool with:
+- \`subagent_type: "general-purpose"\`
+- \`model: "haiku"\`
+- \`description: "Generate 5 absurd jokes"\`
+- \`prompt\`:
+
+\`\`\`
+Eres un comediante especializado en humor absurdo/surrealista en español, al estilo Les Luthiers: lógica rota tratada con seriedad, premisas imposibles, giros inesperados, personajes que razonan desde un axioma falso.
+
+Genera EXACTAMENTE 5 chistes originales. Cada uno debe ser:
+- Corto: máximo 4 líneas.
+- Setup + punchline claro (el punchline recontextualiza el setup).
+- Auto-contenido (sin necesitar contexto externo).
+- Distinto de los demás en tema y mecanismo.
+
+Devuelve ÚNICAMENTE un JSON array con 5 strings, nada más. Sin texto de introducción, sin numeración externa, sin comillas triples de markdown, sin explicación. Ejemplo del formato de salida exacta:
+
+["chiste uno aquí", "chiste dos aquí", "chiste tres aquí", "chiste cuatro aquí", "chiste cinco aquí"]
+\`\`\`
+
+Wait for the agent to finish. From its response, extract the JSON array. Store it as \`chistes_v1\` (a list of 5 strings). If parsing fails, locate the first \`[\` and the matching closing \`]\` in the response and parse that substring.
+
+---
+
+## Step 2 — Sonnet reviews
+
+Invoke the \`Agent\` tool with:
+- \`subagent_type: "general-purpose"\`
+- \`model: "sonnet"\`
+- \`description: "Review 5 jokes"\`
+- \`prompt\` (interpolate \`chistes_v1\` as a JSON array inside the prompt):
+
+\`\`\`
+Eres un editor crítico de comedia absurda en español. Recibe estos 5 chistes:
+
+<INSERT chistes_v1 JSON ARRAY HERE>
+
+Para CADA uno, da feedback específico y accionable sobre:
+(a) timing del punchline — ¿llega en el momento justo o sobra/falta texto?
+(b) claridad de la lógica absurda — ¿se entiende la premisa rota en la primera lectura?
+(c) qué palabra o frase exacta pulir para que golpee más fuerte.
+
+Sé duro pero constructivo. No reescribas el chiste, solo diagnostica.
+
+Devuelve ÚNICAMENTE un JSON array de 5 objetos con esta forma exacta, nada más:
+[{"index": 0, "feedback": "..."}, {"index": 1, "feedback": "..."}, {"index": 2, "feedback": "..."}, {"index": 3, "feedback": "..."}, {"index": 4, "feedback": "..."}]
+\`\`\`
+
+Parse the response to get \`feedback\` (a list of 5 objects with \`index\` and \`feedback\`).
+
+---
+
+## Step 3 — Haiku rewrites with feedback
+
+Invoke the \`Agent\` tool with:
+- \`subagent_type: "general-purpose"\`
+- \`model: "haiku"\`
+- \`description: "Rewrite jokes with feedback"\`
+- \`prompt\` (interpolate both \`chistes_v1\` and \`feedback\`):
+
+\`\`\`
+Eres el mismo comediante del paso 1. Estos son los 5 chistes originales que escribiste:
+
+<INSERT chistes_v1 JSON ARRAY HERE>
+
+Este es el feedback que te dio el editor:
+
+<INSERT feedback JSON ARRAY HERE>
+
+Reescribe los 5 chistes aplicando el feedback específico a cada uno. Mantén el estilo absurdo/surrealista en español. Cada chiste sigue siendo máximo 4 líneas. No cambies el concepto central — pule el timing, la claridad y las palabras clave.
+
+Devuelve ÚNICAMENTE un JSON array con los 5 chistes reescritos, mismo orden que el original, nada más:
+["chiste uno reescrito", "chiste dos reescrito", "chiste tres reescrito", "chiste cuatro reescrito", "chiste cinco reescrito"]
+\`\`\`
+
+Parse to get \`chistes_v2\` (list of 5 strings).
+
+---
+
+## Step 4 — Opus picks the best
+
+Invoke the \`Agent\` tool with:
+- \`subagent_type: "general-purpose"\`
+- \`model: "opus"\`
+- \`description: "Pick best joke"\`
+- \`prompt\` (interpolate \`chistes_v2\`):
+
+\`\`\`
+Eres un juez exigente de comedia absurda en español. De estos 5 chistes, escoge EXACTAMENTE UNO — el mejor por originalidad, timing, claridad de la lógica rota y ejecución del punchline:
+
+<INSERT chistes_v2 JSON ARRAY HERE>
+
+Devuelve ÚNICAMENTE un JSON con esta forma exacta, nada más:
+{"winner_index": N, "winner": "el chiste ganador completo, verbatim", "reason": "1-2 líneas de por qué este es el mejor"}
+\`\`\`
+
+Parse to get \`winner\` (object with \`winner_index\`, \`winner\`, \`reason\`).
+
+---
+
+## Step 5 — Append to training log
+
+Use the \`Bash\` tool to append the winner atomically to \`/Users/kevinmedina/jokes.md\`. The file may not exist yet on first run — the \`>>\` operator creates it.
+
+Run this command (substitute \`<WINNER_TEXT>\` and \`<REASON_TEXT>\` with the values from \`winner\`, escaping any single quotes in them by replacing \`'\` with \`'\\''\`):
+
+\`\`\`bash
+printf '\\n## %s\\n\\n%s\\n\\n_Por qué: %s_\\n\\n---\\n' "$(date '+%Y-%m-%d %H:%M:%S')" '<WINNER_TEXT>' '<REASON_TEXT>' >> /Users/kevinmedina/jokes.md
+\`\`\`
+
+If this is the very first run (file didn't exist), also prepend a header. Check with \`test -s /Users/kevinmedina/jokes.md\` — if the file is now non-empty but lacks a \`# \` header at the top, that's fine, don't worry about it; the date headings are enough.
+
+---
+
+## Step 6 — Report to the user
+
+Output to the user in this exact format, and NOTHING ELSE (no preamble, no summary of the pipeline, no mention of Haiku/Sonnet/Opus):
+
+\`\`\`
+🏆 <winner.winner>
+
+_<winner.reason>_
+\`\`\`
+
+(Use a blank line between the joke and the reason. The trophy emoji is the only emoji allowed — the user explicitly opted in via this command.)
+
+That's it. The log has been updated and the user has their joke for this run.
+
+---
+
+## Error handling
+
+- If any sub-agent returns non-parseable output, retry that step ONE time with a stricter prompt ("Your previous response was not valid JSON. Return ONLY the JSON array, no other text."). If it fails twice, output \`⚠️ El pipeline falló en el paso N. Reintenta con /mejor-chiste.\` and stop — do not write to the log.
+- If Bash append fails, output the winner to the user anyway but warn them the log wasn't updated.
+- Never skip a step. Never substitute a different model. Never do the creative work yourself.`,
+
   's2-model-comparison': `AI Model Comparison Guide - Session 2
 ======================================
 
@@ -640,6 +899,49 @@ export const presentationFolders: PresentationFolder[] = [
         icon: '🎬',
         description: 'Fine-Tuning, Open-Source Models y Billing Packets Killer Demo',
         action: 'open-media:session-3-recording',
+      },
+    ],
+  },
+  {
+    id: 'mental-maps-loops',
+    name: 'Mental Maps & Loops',
+    icon: '🗺️',
+    color: '#FF6B9D',
+    resources: [
+      {
+        name: 'Mental Maps & Loops Presentation',
+        type: 'presentation',
+        icon: '🧠',
+        description: '12 slides on mental mapping, Excalidraw, delegation patterns, and automation loops',
+        action: 'launch:presentation4',
+      },
+      {
+        name: 'Workshop Notes',
+        type: 'document',
+        icon: '📝',
+        description: 'Key concepts, demos, and advice from Session 4',
+        action: 'open-notepad:s4-workshop-notes',
+      },
+      {
+        name: 'Quick Reference Card',
+        type: 'document',
+        icon: '📄',
+        description: 'Excalidraw, delegation, and /loop commands at a glance',
+        action: 'open-notepad:s4-quick-reference',
+      },
+      {
+        name: 'Slash Command: /mejor-chiste',
+        type: 'document',
+        icon: '😂',
+        description: 'Full markdown definition of the 4-step comedy pipeline — copy and adapt for your own skills',
+        action: 'open-notepad:s4-mejor-chiste-command',
+      },
+      {
+        name: 'Terminal',
+        type: 'tool',
+        icon: '💻',
+        description: 'Practice commands in the terminal',
+        action: 'launch:terminal',
       },
     ],
   },

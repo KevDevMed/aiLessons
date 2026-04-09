@@ -80,4 +80,22 @@ export default defineSchema({
     .index("by_player_game", ["playerId", "gameId"])
     // Leaderboard scan: range over all scores for a game, sorted asc by score.
     .index("by_game_score", ["gameId", "score"]),
+
+  // Anonymous post-session feedback. One row per (sessionKey, deviceId):
+  // every device can submit once per session and re-submissions patch the
+  // existing row. Answers are bounded to 5 entries so it's safe to keep them
+  // inline per Convex guidelines.
+  sessionFeedback: defineTable({
+    sessionKey: v.string(),
+    deviceId: v.string(),
+    answers: v.array(
+      v.object({
+        questionId: v.string(), // 'q1'..'q5'
+        optionIndex: v.number(), // 0..4
+      }),
+    ),
+    submittedAt: v.number(),
+  })
+    .index("by_session_device", ["sessionKey", "deviceId"])
+    .index("by_sessionKey", ["sessionKey"]),
 });

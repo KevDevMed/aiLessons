@@ -5,6 +5,8 @@ import { useStartMenuStore } from '../../stores/useStartMenuStore';
 import { useDesktopStore, IconSize } from '../../stores/useDesktopStore';
 import { useTrashStore } from '../../stores/useTrashStore';
 import DesktopIcon from './DesktopIcon';
+import AttendanceTrendWidget from './AttendanceTrendWidget';
+import SessionFeedbackWidget from './SessionFeedbackWidget';
 import styles from './Desktop.module.css';
 
 const CELL_SIZES: Record<IconSize, { w: number; h: number }> = {
@@ -208,6 +210,16 @@ export default function Desktop() {
             />
           );
         })}
+      </div>
+      <div
+        className={styles.widgetLayer}
+        onClick={(e) => e.stopPropagation()}
+        onContextMenu={(e) => e.stopPropagation()}
+      >
+        <div className={styles.widgetStack}>
+          <AttendanceTrendWidget />
+          <SessionFeedbackWidget />
+        </div>
       </div>
     </div>
   );
