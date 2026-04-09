@@ -6,9 +6,13 @@ import { TabStrip } from './TabStrip';
 import { BrowserChrome } from './BrowserChrome';
 import { ArticleList } from './ArticleList';
 import { ArticleDetail } from './ArticleDetail';
+import { useNewsCopy } from './copy';
 import styles from './NewsApp.module.css';
 
 const HOME_ID = 'home';
+const INITIAL_LIMIT = 5;
+const LIMIT_STEP = 10;
+const MAX_LIMIT = 50;
 
 function makeTabId(): string {
   return typeof crypto !== 'undefined' && 'randomUUID' in crypto
@@ -17,10 +21,19 @@ function makeTabId(): string {
 }
 
 export function NewsApp() {
-  const articles = useQuery(api.news.listArticles, { limit: 5 });
+  const copy = useNewsCopy();
+  const [limit, setLimit] = useState(INITIAL_LIMIT);
+  const articles = useQuery(api.news.listArticles, { limit });
 
   const [tabs, setTabs] = useState<Tab[]>(() => [{ kind: 'home', id: HOME_ID }]);
   const [activeId, setActiveId] = useState<string>(HOME_ID);
+
+  const canLoadMore =
+    articles !== undefined && articles.length >= limit && limit < MAX_LIMIT;
+
+  const loadMore = useCallback(() => {
+    setLimit((current) => Math.min(current + LIMIT_STEP, MAX_LIMIT));
+  }, []);
 
   const activeTab = tabs.find((t) => t.id === activeId) ?? tabs[0];
 
@@ -82,10 +95,19 @@ export function NewsApp() {
       <BrowserChrome address={address} />
       <div className={styles.content}>
         {activeTab.kind === 'home' ? (
-          <ArticleList
-            articles={articles}
-            onOpen={(article) => openArticle(article._id, article.title)}
-          />
+          <>
+            <ArticleList
+              articles={articles}
+              onOpen={(article) => openArticle(article._id, article.title)}
+            />
+            {canLoadMore && (
+              <div className={styles.loadMoreWrap}>
+                <button type="button" className={styles.loadMoreBtn} onClick={loadMore}>
+                  {copy.showMore}
+                </button>
+              </div>
+            )}
+          </>
         ) : (
           <ArticleDetail
             article={articles === undefined ? undefined : selectedArticle}

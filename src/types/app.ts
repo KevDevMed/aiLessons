@@ -17,4 +17,6 @@ export interface AppDefinition {
   minHeight: number;
   singleton: boolean;
   tileSize: TileSize;
+  /** When true, the app does not appear on the desktop (still shows in Start Menu). */
+  hiddenFromDesktop?: boolean;
 }

@@ -3,10 +3,8 @@ import { internal } from "./_generated/api";
 
 const crons = cronJobs();
 
-crons.daily(
-  "fetch ai news",
-  { hourUTC: 9, minuteUTC: 0 },
-  internal.news.fetchAINews,
-);
+// Daily at 09:00 UTC. Using crons.cron() per Convex guidelines (crons.daily
+// is explicitly disallowed in convex/_generated/ai/guidelines.md).
+crons.cron("fetch ai news", "0 9 * * *", internal.news.fetchAINews, {});
 
 export default crons;

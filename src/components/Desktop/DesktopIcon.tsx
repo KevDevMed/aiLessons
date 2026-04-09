@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from 'react';
+import { memo, useCallback, useRef, useState } from 'react';
 import styles from './DesktopIcon.module.css';
 
 import { IconSize } from '../../stores/useDesktopStore';
@@ -9,19 +9,22 @@ interface DesktopIconProps {
   label: string;
   selected: boolean;
   iconSize?: IconSize;
-  position: { x: number; y: number };
-  onSelect: () => void;
-  onLaunch: () => void;
-  onDragEnd: (x: number, y: number) => void;
-  onContextMenu?: (e: React.MouseEvent) => void;
+  x: number;
+  y: number;
+  onSelect: (appId: string) => void;
+  onLaunch: (appId: string) => void;
+  onDragEnd: (appId: string, x: number, y: number) => void;
+  onContextMenu: (e: React.MouseEvent, appId: string, label: string, icon: string) => void;
 }
 
-export default function DesktopIcon({
+function DesktopIconInner({
+  appId,
   icon,
   label,
   selected,
   iconSize = 'medium',
-  position,
+  x,
+  y,
   onSelect,
   onLaunch,
   onDragEnd,
@@ -42,14 +45,14 @@ export default function DesktopIcon({
     if (clickTimer.current) {
       clearTimeout(clickTimer.current);
       clickTimer.current = null;
-      onLaunch();
+      onLaunch(appId);
     } else {
-      onSelect();
+      onSelect(appId);
       clickTimer.current = setTimeout(() => {
         clickTimer.current = null;
       }, 300);
     }
-  }, [onSelect, onLaunch]);
+  }, [appId, onSelect, onLaunch]);
 
   const handleMouseDown = useCallback(
     (e: React.MouseEvent) => {
@@ -59,8 +62,8 @@ export default function DesktopIcon({
       dragState.current = {
         startX: e.clientX,
         startY: e.clientY,
-        startPosX: position.x,
-        startPosY: position.y,
+        startPosX: x,
+        startPosY: y,
         dragged: false,
       };
 
@@ -80,7 +83,7 @@ export default function DesktopIcon({
         document.removeEventListener('mousemove', handleMouseMove);
         document.removeEventListener('mouseup', handleMouseUp);
         if (dragState.current?.dragged) {
-          onDragEnd(currentDragPos.current.x, currentDragPos.current.y);
+          onDragEnd(appId, currentDragPos.current.x, currentDragPos.current.y);
           setDragPos(null);
         } else {
           handleClick();
@@ -91,10 +94,18 @@ export default function DesktopIcon({
       document.addEventListener('mousemove', handleMouseMove);
       document.addEventListener('mouseup', handleMouseUp);
     },
-    [position, onDragEnd, handleClick]
+    [appId, x, y, onDragEnd, handleClick]
   );
 
-  const displayPos = dragPos || position;
+  const handleContextMenu = useCallback(
+    (e: React.MouseEvent) => {
+      onContextMenu(e, appId, label, icon);
+    },
+    [appId, label, icon, onContextMenu]
+  );
+
+  const displayX = dragPos?.x ?? x;
+  const displayY = dragPos?.y ?? y;
   const isDragging = dragPos !== null;
 
   return (
@@ -102,14 +113,17 @@ export default function DesktopIcon({
       className={`${styles.icon} ${selected ? styles.selected : ''} ${iconSize === 'large' ? styles.iconLarge : iconSize === 'small' ? styles.iconSmall : ''} ${isDragging ? styles.dragging : ''}`}
       style={{
         position: 'absolute',
-        left: displayPos.x,
-        top: displayPos.y,
+        left: displayX,
+        top: displayY,
       }}
       onMouseDown={handleMouseDown}
-      onContextMenu={onContextMenu}
+      onContextMenu={handleContextMenu}
     >
       <div className={styles.iconImage}>{icon}</div>
       <span className={styles.label}>{label}</span>
     </div>
   );
 }
+
+const DesktopIcon = memo(DesktopIconInner);
+export default DesktopIcon;

@@ -1,40 +1,43 @@
-import { useMemo } from 'react';
+import { memo, useMemo } from 'react';
 import { Rnd } from 'react-rnd';
 import { useWindowStore } from '../../stores/useWindowStore';
 import { useAppStore } from '../../stores/useAppStore';
-import { WindowState } from '../../types/window';
 import WindowTitleBar from './WindowTitleBar';
 import styles from './Window.module.css';
 
 interface WindowProps {
-  win: WindowState;
+  windowId: string;
   zIndex: number;
 }
 
-export default function Window({ win, zIndex }: WindowProps) {
+function WindowInner({ windowId, zIndex }: WindowProps) {
+  const win = useWindowStore((s) => s.windows[windowId]);
   const moveWindow = useWindowStore((s) => s.moveWindow);
   const resizeWindow = useWindowStore((s) => s.resizeWindow);
   const focusWindow = useWindowStore((s) => s.focusWindow);
-  const registry = useAppStore((s) => s.registry);
-
-  const appDef = registry[win.appId];
+  // Subscribe to just this app's definition so registering new apps doesn't
+  // re-render every open window. Assigning the component to a local keeps
+  // the lint rule about "components created during render" happy.
+  const appDef = useAppStore((s) => (win ? s.registry[win.appId] : undefined));
   const AppComponent = appDef?.component;
 
   const rndPosition = useMemo(
     () =>
-      win.isMaximized
+      win?.isMaximized
         ? { x: 0, y: 0 }
-        : { x: win.x, y: win.y },
-    [win.isMaximized, win.x, win.y]
+        : { x: win?.x ?? 0, y: win?.y ?? 0 },
+    [win?.isMaximized, win?.x, win?.y]
   );
 
   const rndSize = useMemo(
     () =>
-      win.isMaximized
+      win?.isMaximized
         ? { width: '100%', height: '100%' }
-        : { width: win.width, height: win.height },
-    [win.isMaximized, win.width, win.height]
+        : { width: win?.width ?? 0, height: win?.height ?? 0 },
+    [win?.isMaximized, win?.width, win?.height]
   );
+
+  if (!win || win.isMinimized) return null;
 
   return (
     <Rnd
@@ -72,3 +75,6 @@ export default function Window({ win, zIndex }: WindowProps) {
     </Rnd>
   );
 }
+
+const Window = memo(WindowInner);
+export default Window;

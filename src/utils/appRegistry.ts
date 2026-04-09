@@ -80,6 +80,7 @@ export const APP_REGISTRY: Record<string, AppDefinition> = {
     minHeight: 380,
     singleton: true,
     tileSize: 'wide',
+    hiddenFromDesktop: true,
   },
   'presentation2': {
     id: 'presentation2',
@@ -92,6 +93,7 @@ export const APP_REGISTRY: Record<string, AppDefinition> = {
     minHeight: 380,
     singleton: true,
     tileSize: 'wide',
+    hiddenFromDesktop: true,
   },
   'presentation3': {
     id: 'presentation3',
@@ -104,6 +106,7 @@ export const APP_REGISTRY: Record<string, AppDefinition> = {
     minHeight: 380,
     singleton: true,
     tileSize: 'wide',
+    hiddenFromDesktop: true,
   },
   'terminal': {
     id: 'terminal',
@@ -128,6 +131,7 @@ export const APP_REGISTRY: Record<string, AppDefinition> = {
     minHeight: 400,
     singleton: true,
     tileSize: 'small',
+    hiddenFromDesktop: true,
   },
   'tetris': {
     id: 'tetris',
@@ -140,6 +144,7 @@ export const APP_REGISTRY: Record<string, AppDefinition> = {
     minHeight: 500,
     singleton: true,
     tileSize: 'small',
+    hiddenFromDesktop: true,
   },
   'brick-breaker': {
     id: 'brick-breaker',
@@ -152,6 +157,7 @@ export const APP_REGISTRY: Record<string, AppDefinition> = {
     minHeight: 500,
     singleton: true,
     tileSize: 'small',
+    hiddenFromDesktop: true,
   },
   'doom': {
     id: 'doom',
@@ -164,6 +170,7 @@ export const APP_REGISTRY: Record<string, AppDefinition> = {
     minHeight: 480,
     singleton: true,
     tileSize: 'medium',
+    hiddenFromDesktop: true,
   },
   'flappy-bird': {
     id: 'flappy-bird',
@@ -176,6 +183,7 @@ export const APP_REGISTRY: Record<string, AppDefinition> = {
     minHeight: 450,
     singleton: true,
     tileSize: 'small',
+    hiddenFromDesktop: true,
   },
   'games': {
     id: 'games',
@@ -200,6 +208,7 @@ export const APP_REGISTRY: Record<string, AppDefinition> = {
     minHeight: 300,
     singleton: false,
     tileSize: 'small',
+    hiddenFromDesktop: true,
   },
   'image-viewer': {
     id: 'image-viewer',
@@ -212,6 +221,7 @@ export const APP_REGISTRY: Record<string, AppDefinition> = {
     minHeight: 250,
     singleton: false,
     tileSize: 'small',
+    hiddenFromDesktop: true,
   },
   'media-player': {
     id: 'media-player',
@@ -224,6 +234,7 @@ export const APP_REGISTRY: Record<string, AppDefinition> = {
     minHeight: 300,
     singleton: false,
     tileSize: 'small',
+    hiddenFromDesktop: true,
   },
   'lessons': {
     id: 'lessons',

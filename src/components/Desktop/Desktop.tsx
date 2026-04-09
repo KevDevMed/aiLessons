@@ -37,13 +37,14 @@ export default function Desktop() {
   const setSortBy = useDesktopStore((s) => s.setSortBy);
   const iconPositions = useDesktopStore((s) => s.iconPositions);
   const setIconPosition = useDesktopStore((s) => s.setIconPosition);
-  const addTrashItem = useTrashStore((s) => s.addItem);
+  const deletedAppIds = useDesktopStore((s) => s.deletedAppIds);
+  const deleteApp = useDesktopStore((s) => s.deleteApp);
   const [selectedAppId, setSelectedAppId] = useState<string | null>(null);
-  const [deletedAppIds, setDeletedAppIds] = useState<string[]>([]);
 
   const desktopApps = useMemo(() => {
-    const hiddenIds = ['presentation', 'presentation2', 'presentation3', 'spreadsheet', 'image-viewer', 'media-player', 'snake', 'tetris', 'brick-breaker', 'doom', 'flappy-bird'];
-    const apps = Object.values(registry).filter((a) => !hiddenIds.includes(a.id) && !deletedAppIds.includes(a.id));
+    const apps = Object.values(registry).filter(
+      (a) => !a.hiddenFromDesktop && !deletedAppIds.includes(a.id)
+    );
     switch (sortBy) {
       case 'name':
         return apps.sort((a, b) => a.name.localeCompare(b.name));
@@ -88,7 +89,7 @@ export default function Desktop() {
           action: () => {
             const now = new Date();
             const dateStr = `${now.getMonth() + 1}/${now.getDate()}/${now.getFullYear()} ${now.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}`;
-            addTrashItem({
+            useTrashStore.getState().addItem({
               id: `trash-app-${appId}-${Date.now()}`,
               name: appName,
               icon: appIcon,
@@ -98,14 +99,14 @@ export default function Desktop() {
               size: '—',
               appId,
             });
-            setDeletedAppIds((prev) => [...prev, appId]);
+            deleteApp(appId);
             setSelectedAppId(null);
           },
         });
       }
       showMenu(e.clientX, e.clientY, menuItems);
     },
-    [launchApp, showMenu, addTrashItem]
+    [launchApp, showMenu, deleteApp]
   );
 
   const handleContextMenu = useCallback(
@@ -163,6 +164,28 @@ export default function Desktop() {
     closeStartMenu();
   }, [closeStartMenu]);
 
+  // Stable per-icon callbacks: each takes appId as an argument so the same
+  // function reference can serve every icon. DesktopIcon is memoized and
+  // partially-applies these in its own handlers.
+  const handleIconSelect = useCallback((appId: string) => {
+    setSelectedAppId(appId);
+  }, []);
+
+  const handleIconLaunch = useCallback(
+    (appId: string) => {
+      launchApp(appId);
+      setSelectedAppId(null);
+    },
+    [launchApp]
+  );
+
+  const handleIconDragEnd = useCallback(
+    (appId: string, x: number, y: number) => {
+      setIconPosition(appId, x, y);
+    },
+    [setIconPosition]
+  );
+
   return (
     <div className={styles.desktop} onContextMenu={handleContextMenu} onClick={handleClick}>
       <div className={styles.iconGrid}>
@@ -176,14 +199,12 @@ export default function Desktop() {
               label={app.name}
               selected={selectedAppId === app.id}
               iconSize={iconSize}
-              position={pos}
-              onSelect={() => setSelectedAppId(app.id)}
-              onLaunch={() => {
-                launchApp(app.id);
-                setSelectedAppId(null);
-              }}
-              onDragEnd={(x, y) => setIconPosition(app.id, x, y)}
-              onContextMenu={(e) => handleIconContextMenu(e, app.id, app.name, app.icon)}
+              x={pos.x}
+              y={pos.y}
+              onSelect={handleIconSelect}
+              onLaunch={handleIconLaunch}
+              onDragEnd={handleIconDragEnd}
+              onContextMenu={handleIconContextMenu}
             />
           );
         })}

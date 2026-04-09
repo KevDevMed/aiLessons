@@ -1,4 +1,6 @@
 import { create } from 'zustand';
+import { persist, createJSONStorage } from 'zustand/middleware';
+import { useDesktopStore } from './useDesktopStore';
 
 export interface TrashItem {
   id: string;
@@ -15,6 +17,7 @@ export interface TrashItem {
 
 interface TrashStore {
   items: TrashItem[];
+  /** Files that have been restored from trash; FileExplorer renders these at their originalLocation. Apps are not added here — they go back on the desktop instead. */
   restoredItems: TrashItem[];
   addItem: (item: TrashItem) => void;
   removeItem: (id: string) => void;
@@ -135,28 +138,47 @@ const funnyDefaults: TrashItem[] = [
   },
 ];
 
-export const useTrashStore = create<TrashStore>((set) => ({
-  items: [...funnyDefaults],
-  restoredItems: [],
+export const useTrashStore = create<TrashStore>()(
+  persist(
+    (set, get) => ({
+      items: [...funnyDefaults],
+      restoredItems: [],
 
-  addItem: (item) =>
-    set((state) => ({
-      items: [item, ...state.items],
-    })),
+      addItem: (item) =>
+        set((state) => ({
+          items: [item, ...state.items],
+        })),
 
-  removeItem: (id) =>
-    set((state) => ({
-      items: state.items.filter((i) => i.id !== id),
-    })),
+      removeItem: (id) =>
+        set((state) => ({
+          items: state.items.filter((i) => i.id !== id),
+        })),
 
-  emptyTrash: () => set({ items: [] }),
+      emptyTrash: () => set({ items: [] }),
 
-  restoreItem: (id) =>
-    set((state) => {
-      const item = state.items.find((i) => i.id === id);
-      return {
-        items: state.items.filter((i) => i.id !== id),
-        restoredItems: item ? [...state.restoredItems, item] : state.restoredItems,
-      };
+      restoreItem: (id) => {
+        const item = get().items.find((i) => i.id === id);
+        if (!item) return;
+
+        if (item.type === 'app' && item.appId) {
+          // Apps go back to the desktop via the desktop store, not into restoredItems.
+          useDesktopStore.getState().restoreApp(item.appId);
+          set((state) => ({
+            items: state.items.filter((i) => i.id !== id),
+          }));
+        } else {
+          // Files get added to restoredItems so FileExplorer shows them at their
+          // original location.
+          set((state) => ({
+            items: state.items.filter((i) => i.id !== id),
+            restoredItems: [...state.restoredItems, item],
+          }));
+        }
+      },
     }),
-}));
+    {
+      name: 'ailessons-trash',
+      storage: createJSONStorage(() => localStorage),
+    }
+  )
+);

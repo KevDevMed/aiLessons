@@ -6,13 +6,12 @@ interface AppStore {
   registry: Record<string, AppDefinition>;
   pinnedTaskbar: string[];
   pinnedTiles: Array<{ appId: string; size: TileSize }>;
+  nextWindowSeq: number;
 
   registerApp: (def: AppDefinition) => void;
   launchApp: (appId: string, initialData?: Record<string, unknown>) => void;
   getRunningApps: () => string[];
 }
-
-let windowCounter = 0;
 
 export const useAppStore = create<AppStore>((set, get) => ({
   registry: {},
@@ -24,6 +23,7 @@ export const useAppStore = create<AppStore>((set, get) => ({
     { appId: 'settings', size: 'medium' },
     { appId: 'terminal', size: 'medium' },
   ],
+  nextWindowSeq: 0,
 
   registerApp: (def) => {
     set((state) => ({
@@ -51,13 +51,17 @@ export const useAppStore = create<AppStore>((set, get) => ({
       }
     }
 
-    windowCounter++;
-    const windowId = `${appId}-${windowCounter}`;
+    let seq = 0;
+    set((state) => {
+      seq = state.nextWindowSeq + 1;
+      return { nextWindowSeq: seq };
+    });
+    const windowId = `${appId}-${seq}`;
 
     const screenW = window.innerWidth;
     const screenH = window.innerHeight - 40;
-    const x = Math.max(20, (screenW - def.defaultWidth) / 2 + (windowCounter % 5) * 20);
-    const y = Math.max(20, (screenH - def.defaultHeight) / 2 + (windowCounter % 5) * 20);
+    const x = Math.max(20, (screenW - def.defaultWidth) / 2 + (seq % 5) * 20);
+    const y = Math.max(20, (screenH - def.defaultHeight) / 2 + (seq % 5) * 20);
 
     windowStore.openWindow({
       id: windowId,
