@@ -11,6 +11,26 @@ const learningItemValidator = v.object({
   exampleTranslation: v.optional(v.string()),
 });
 
+export const gameIdValidator = v.union(
+  v.literal("snake"),
+  v.literal("tetris"),
+  v.literal("brick-breaker"),
+  v.literal("flappy-bird"),
+  v.literal("doom"),
+);
+
+export const scoreDetailValidator = v.optional(
+  v.object({
+    level: v.optional(v.number()),
+    lines: v.optional(v.number()),
+    lives: v.optional(v.number()),
+    kills: v.optional(v.number()),
+    totalEnemies: v.optional(v.number()),
+    killPct: v.optional(v.number()),
+    levelCompleted: v.optional(v.boolean()),
+  }),
+);
+
 export default defineSchema({
   articles: defineTable({
     title: v.string(),
@@ -40,4 +60,24 @@ export default defineSchema({
     .index("by_publishedAt", ["publishedAt"])
     .index("by_fetchedAt", ["fetchedAt"])
     .index("by_url", ["url"]),
+
+  players: defineTable({
+    deviceId: v.string(), // client-generated UUID stored in localStorage
+    displayName: v.string(),
+    isDev: v.boolean(), // true only for the seeded "Kevin the supreme dev" row
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  }).index("by_deviceId", ["deviceId"]),
+
+  scores: defineTable({
+    playerId: v.id("players"),
+    gameId: gameIdValidator,
+    score: v.number(), // normalized single metric, higher is better
+    detail: scoreDetailValidator,
+    updatedAt: v.number(),
+  })
+    // Upsert best: at most one row per (player, game).
+    .index("by_player_game", ["playerId", "gameId"])
+    // Leaderboard scan: range over all scores for a game, sorted asc by score.
+    .index("by_game_score", ["gameId", "score"]),
 });

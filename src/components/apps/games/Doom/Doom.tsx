@@ -1,5 +1,8 @@
 import { useRef, useEffect, useCallback, useState } from 'react';
 import { AppProps } from '../../../../types/app';
+import { useSubmitScore } from '../../../../hooks/useSubmitScore';
+import { LeaderboardPanel } from '../shared/LeaderboardPanel';
+import { computeDoomScore } from '../../../../utils/doomScore';
 import styles from './Doom.module.css';
 
 // ============================================================
@@ -796,6 +799,7 @@ function hexToRgb(hex: string): [number, number, number] {
 // ============================================================
 
 export function Doom({ windowId: _windowId }: AppProps) {
+  const { submitScore } = useSubmitScore('doom');
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const wrapperRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -2455,6 +2459,27 @@ export function Doom({ windowId: _windowId }: AppProps) {
     return () => sound.cleanup();
   }, []);
 
+  // Submit score to leaderboard on death or level complete.
+  // computeDoomScore normalizes level + kills + completion into a single
+  // comparable metric (see src/utils/doomScore.ts).
+  useEffect(() => {
+    if (gameScreen !== 'gameover' && gameScreen !== 'levelcomplete') return;
+    const level = currentLevelRef.current + 1;
+    const kills = killCountRef.current;
+    const totalEnemies = totalKillsRef.current;
+    const levelCompleted = gameScreen === 'levelcomplete';
+    const killPct =
+      totalEnemies > 0 ? Math.round((kills / totalEnemies) * 1000) / 10 : 0;
+    const score = computeDoomScore({ level, kills, totalEnemies, levelCompleted });
+    void submitScore(score, {
+      level,
+      kills,
+      totalEnemies,
+      killPct,
+      levelCompleted,
+    });
+  }, [gameScreen, submitScore]);
+
   // ============================================================
   // RENDER JSX
   // ============================================================
@@ -2503,6 +2528,7 @@ export function Doom({ windowId: _windowId }: AppProps) {
             <div className={styles.stats}>
               Level {displayLevel} | Kills: {displayKills}/{displayTotalEnemies}
             </div>
+            <LeaderboardPanel gameId="doom" />
             <button className={styles.menuButton} onClick={startNewGame}>TRY AGAIN</button>
             <button className={styles.menuButton} onClick={returnToTitle}>QUIT</button>
           </div>
@@ -2516,6 +2542,7 @@ export function Doom({ windowId: _windowId }: AppProps) {
               Health: {displayHealth} |
               Ammo: {displayAmmo}
             </div>
+            <LeaderboardPanel gameId="doom" />
             {currentLevelRef.current < MAPS.length - 1 ? (
               <button className={styles.menuButton} onClick={nextLevel}>NEXT LEVEL</button>
             ) : (

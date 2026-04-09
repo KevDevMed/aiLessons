@@ -5,6 +5,8 @@ import StartMenu from './components/StartMenu/StartMenu';
 import WindowLayer from './components/WindowManager/WindowLayer';
 import ContextMenu from './components/ContextMenu/ContextMenu';
 import PowerOverlay from './components/PowerOverlay/PowerOverlay';
+import { DisplayNamePrompt } from './components/DisplayNamePrompt/DisplayNamePrompt';
+import { DevSeedBootstrap } from './components/DevSeedBootstrap/DevSeedBootstrap';
 import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts';
 import { useAppStore } from './stores/useAppStore';
 import { useDesktopStore } from './stores/useDesktopStore';
@@ -46,6 +48,8 @@ function App() {
       <Taskbar />
       <ContextMenu />
       <PowerOverlay />
+      <DisplayNamePrompt />
+      <DevSeedBootstrap />
     </div>
   );
 }

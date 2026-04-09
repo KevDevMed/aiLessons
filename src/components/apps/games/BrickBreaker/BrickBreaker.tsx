@@ -1,5 +1,7 @@
 import { useRef, useEffect, useCallback, useState } from 'react';
 import { AppProps } from '../../../../types/app';
+import { useSubmitScore } from '../../../../hooks/useSubmitScore';
+import { LeaderboardPanel } from '../shared/LeaderboardPanel';
 import styles from './BrickBreaker.module.css';
 
 type GameStatus = 'idle' | 'running' | 'paused' | 'over' | 'won';
@@ -241,7 +243,8 @@ function initState(canvasW: number, canvasH: number, level = 1): GameState {
   };
 }
 
-export function BrickBreaker({ windowId }: AppProps) {
+export function BrickBreaker({ windowId: _windowId }: AppProps) {
+  const { submitScore } = useSubmitScore('brick-breaker');
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const wrapperRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -614,6 +617,14 @@ export function BrickBreaker({ windowId }: AppProps) {
     containerRef.current?.focus();
   }, []);
 
+  // Submit score whenever the game transitions to game over.
+  useEffect(() => {
+    if (gameStatus === 'over') {
+      const g = gameRef.current;
+      void submitScore(g.score, { level: g.level });
+    }
+  }, [gameStatus, submitScore]);
+
   return (
     <div
       ref={containerRef}
@@ -654,6 +665,7 @@ export function BrickBreaker({ windowId }: AppProps) {
           <div className={styles.overlay}>
             <div className={styles.overlayTitle}>Game Over</div>
             <div className={styles.overlayScore}>Score: {score}</div>
+            <LeaderboardPanel gameId="brick-breaker" />
             <div className={styles.overlayHint}>Press Space to restart</div>
           </div>
         )}

@@ -11,6 +11,7 @@ const GAMES = [
   { id: 'brick-breaker', name: 'Brick Breaker', icon: '🏓', date: '3/10/2026 2:00 PM', size: '1.0 MB' },
   { id: 'doom', name: 'DOOM', icon: '💀', date: '3/10/2026 2:00 PM', size: '64 MB' },
   { id: 'flappy-bird', name: 'Flappy Bird', icon: '🐤', date: '3/10/2026 2:00 PM', size: '0.5 MB' },
+  { id: 'leaderboards', name: 'Leaderboards', icon: '🏆', date: '4/9/2026 12:00 PM', size: '0.2 MB' },
 ];
 
 const sidebarItems = [

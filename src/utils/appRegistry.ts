@@ -13,6 +13,7 @@ import { BrickBreaker } from '../components/apps/games/BrickBreaker/BrickBreaker
 import { Doom } from '../components/apps/games/Doom/Doom';
 import { FlappyBird } from '../components/apps/games/FlappyBird/FlappyBird';
 import { GamesFolder } from '../components/apps/GamesFolder/GamesFolder';
+import { Leaderboards } from '../components/apps/Leaderboards/Leaderboards';
 import { Spreadsheet } from '../components/apps/Spreadsheet/Spreadsheet';
 import { ImageViewer } from '../components/apps/ImageViewer/ImageViewer';
 import { MediaPlayer } from '../components/apps/MediaPlayer/MediaPlayer';
@@ -196,6 +197,19 @@ export const APP_REGISTRY: Record<string, AppDefinition> = {
     minHeight: 300,
     singleton: true,
     tileSize: 'medium',
+  },
+  'leaderboards': {
+    id: 'leaderboards',
+    name: 'Leaderboards',
+    icon: '🏆',
+    component: Leaderboards,
+    defaultWidth: 900,
+    defaultHeight: 600,
+    minWidth: 520,
+    minHeight: 420,
+    singleton: true,
+    tileSize: 'wide',
+    hiddenFromDesktop: true,
   },
   'spreadsheet': {
     id: 'spreadsheet',

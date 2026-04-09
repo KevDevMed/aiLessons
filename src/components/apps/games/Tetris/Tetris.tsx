@@ -1,5 +1,7 @@
 import { useRef, useEffect, useCallback, useState } from 'react';
 import { AppProps } from '../../../../types/app';
+import { useSubmitScore } from '../../../../hooks/useSubmitScore';
+import { LeaderboardPanel } from '../shared/LeaderboardPanel';
 import styles from './Tetris.module.css';
 
 type GameStatus = 'idle' | 'running' | 'paused' | 'over';
@@ -323,6 +325,7 @@ class TetrisSoundEngine {
 }
 
 export function Tetris({ windowId: _windowId }: AppProps) {
+  const { submitScore } = useSubmitScore('tetris');
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const nextCanvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -714,6 +717,16 @@ export function Tetris({ windowId: _windowId }: AppProps) {
     containerRef.current?.focus();
   }, []);
 
+  // Submit score whenever the game transitions to game over.
+  useEffect(() => {
+    if (gameStatus === 'over') {
+      void submitScore(scoreRef.current, {
+        level: levelRef.current,
+        lines: linesRef.current,
+      });
+    }
+  }, [gameStatus, submitScore]);
+
   return (
     <div
       ref={containerRef}
@@ -781,6 +794,7 @@ export function Tetris({ windowId: _windowId }: AppProps) {
           <div className={styles.overlay}>
             <div className={styles.overlayTitle}>Game Over</div>
             <div className={styles.overlayScore}>Score: {score}</div>
+            <LeaderboardPanel gameId="tetris" />
             <div className={styles.overlayHint}>Press Space to restart</div>
           </div>
         )}

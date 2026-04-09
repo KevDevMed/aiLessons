@@ -1,5 +1,7 @@
 import { useRef, useEffect, useCallback, useState } from 'react';
 import { AppProps } from '../../../../types/app';
+import { useSubmitScore } from '../../../../hooks/useSubmitScore';
+import { LeaderboardPanel } from '../shared/LeaderboardPanel';
 import styles from './Snake.module.css';
 
 type Direction = 'UP' | 'DOWN' | 'LEFT' | 'RIGHT';
@@ -106,7 +108,8 @@ class SnakeSoundEngine {
   }
 }
 
-export function Snake({ windowId }: AppProps) {
+export function Snake({ windowId: _windowId }: AppProps) {
+  const { submitScore } = useSubmitScore('snake');
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const wrapperRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -359,6 +362,13 @@ export function Snake({ windowId }: AppProps) {
     containerRef.current?.focus();
   }, []);
 
+  // Submit score whenever the game transitions to game over.
+  useEffect(() => {
+    if (gameStatus === 'over') {
+      void submitScore(scoreRef.current);
+    }
+  }, [gameStatus, submitScore]);
+
   return (
     <div
       ref={containerRef}
@@ -383,6 +393,7 @@ export function Snake({ windowId }: AppProps) {
           <div className={styles.overlay}>
             <div className={styles.overlayTitle}>Game Over</div>
             <div className={styles.overlayScore}>Score: {score}</div>
+            <LeaderboardPanel gameId="snake" />
             <div className={styles.overlayHint}>Press Space to restart</div>
           </div>
         )}

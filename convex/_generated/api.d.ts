@@ -9,6 +9,7 @@
  */
 
 import type * as crons from "../crons.js";
+import type * as leaderboards from "../leaderboards.js";
 import type * as news from "../news.js";
 
 import type {
@@ -19,6 +20,7 @@ import type {
 
 declare const fullApi: ApiFromModules<{
   crons: typeof crons;
+  leaderboards: typeof leaderboards;
   news: typeof news;
 }>;
 
