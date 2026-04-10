@@ -278,6 +278,61 @@
   letter-spacing: 0.2px;
 }
 
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 4px;
+  padding-top: 6px;
+  border-top: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.pageBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 18px;
+  padding: 0;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: var(--win-text-primary);
+  font-family: var(--win-font);
+  font-size: 9px;
+  line-height: 1;
+  cursor: pointer;
+  transition: background var(--win-transition-fast),
+    border-color var(--win-transition-fast),
+    color var(--win-transition-fast);
+}
+
+.pageBtn:hover:not(:disabled) {
+  background: rgba(66, 156, 227, 0.18);
+  border-color: rgba(66, 156, 227, 0.55);
+  color: var(--win-accent-light);
+}
+
+.pageBtn:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.pageBtn:disabled {
+  opacity: 0.28;
+  cursor: default;
+}
+
+.pageInfo {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--win-text-secondary);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.4px;
+  min-width: 34px;
+  text-align: center;
+}
+
 /* Hide on very small screens so it doesn't cover icons */
 @media (max-width: 640px) {
   .widget {

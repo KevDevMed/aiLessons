@@ -1,4 +1,5 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
+import type { KeyboardEvent, MouseEvent } from 'react';
 import { lessonAttendance } from '../../data/lessonAttendance';
 import { useAppStore } from '../../stores/useAppStore';
 import styles from './AttendanceTrendWidget.module.css';
@@ -8,6 +9,7 @@ const CHART_H = 86;
 const PAD_X = 14;
 const PAD_TOP = 10;
 const PAD_BOTTOM = 22;
+const ATTENDERS_PER_PAGE = 5;
 
 export default function AttendanceTrendWidget() {
   const launchApp = useAppStore((s) => s.launchApp);
@@ -56,10 +58,11 @@ export default function AttendanceTrendWidget() {
     return { points, path, area, max, min };
   }, [sessions]);
 
-  const topAttenders = useMemo(() => {
+  const rankedAttenders = useMemo(() => {
     const byEmail = new Map<
       string,
       {
+        email: string;
         name: string;
         sessions: number;
         totalSeconds: number;
@@ -81,6 +84,7 @@ export default function AttendanceTrendWidget() {
           }
         } else {
           byEmail.set(key, {
+            email: key,
             name: p.name,
             sessions: 1,
             totalSeconds: p.durationSeconds,
@@ -90,12 +94,38 @@ export default function AttendanceTrendWidget() {
       }
     }
 
-    return [...byEmail.values()]
-      .sort(
-        (a, b) => b.sessions - a.sessions || b.totalSeconds - a.totalSeconds
-      )
-      .slice(0, 5);
+    return [...byEmail.values()].sort(
+      (a, b) => b.sessions - a.sessions || b.totalSeconds - a.totalSeconds
+    );
   }, [sessions]);
+
+  const [page, setPage] = useState(0);
+  const pageCount = Math.max(
+    1,
+    Math.ceil(rankedAttenders.length / ATTENDERS_PER_PAGE)
+  );
+  const safePage = Math.min(page, pageCount - 1);
+  const visibleAttenders = rankedAttenders.slice(
+    safePage * ATTENDERS_PER_PAGE,
+    safePage * ATTENDERS_PER_PAGE + ATTENDERS_PER_PAGE
+  );
+
+  const handleLaunch = () => launchApp('attendance');
+  const handleWidgetKeyDown = (e: KeyboardEvent<HTMLDivElement>) => {
+    if (e.target !== e.currentTarget) return;
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      handleLaunch();
+    }
+  };
+  const goPrev = (e: MouseEvent<HTMLButtonElement>) => {
+    e.stopPropagation();
+    setPage((p) => Math.max(0, p - 1));
+  };
+  const goNext = (e: MouseEvent<HTMLButtonElement>) => {
+    e.stopPropagation();
+    setPage((p) => Math.min(pageCount - 1, p + 1));
+  };
 
   if (sessions.length === 0) {
     return null;
@@ -122,9 +152,12 @@ export default function AttendanceTrendWidget() {
       : styles.deltaFlat;
 
   return (
-    <button
+    <div
       className={styles.widget}
-      onClick={() => launchApp('attendance')}
+      onClick={handleLaunch}
+      onKeyDown={handleWidgetKeyDown}
+      role="button"
+      tabIndex={0}
       title="Open Attendance Reports"
     >
       <div className={styles.header}>
@@ -205,34 +238,65 @@ export default function AttendanceTrendWidget() {
         ))}
       </svg>
 
-      {topAttenders.length > 0 && (
+      {rankedAttenders.length > 0 && (
         <div className={styles.leaderboard}>
           <div className={styles.leaderboardHeader}>
-            <span className={styles.leaderboardTitle}>Top Attenders</span>
+            <span className={styles.leaderboardTitle}>Leaderboard</span>
             <span className={styles.leaderboardHint}>
-              {sessions.length} sessions
+              {rankedAttenders.length} people · {sessions.length} sessions
             </span>
           </div>
           <ol className={styles.leaderboardList}>
-            {topAttenders.map((a, i) => (
-              <li key={a.name} className={styles.leaderboardRow}>
-                <span className={styles.rank} data-rank={i + 1}>
-                  {i + 1}
-                </span>
-                <span className={styles.attenderName}>{a.name}</span>
-                <span className={styles.attenderMetrics}>
-                  <span className={styles.attenderCount}>
-                    {a.sessions}/{sessions.length}
+            {visibleAttenders.map((a, i) => {
+              const globalRank = safePage * ATTENDERS_PER_PAGE + i + 1;
+              return (
+                <li key={a.email} className={styles.leaderboardRow}>
+                  <span className={styles.rank} data-rank={globalRank}>
+                    {globalRank}
                   </span>
-                  <span className={styles.attenderMinutes}>
-                    {Math.round(a.totalSeconds / 60)}m
+                  <span className={styles.attenderName}>{a.name}</span>
+                  <span className={styles.attenderMetrics}>
+                    <span className={styles.attenderCount}>
+                      {a.sessions}/{sessions.length}
+                    </span>
+                    <span className={styles.attenderMinutes}>
+                      {Math.round(a.totalSeconds / 60)}m
+                    </span>
                   </span>
-                </span>
-              </li>
-            ))}
+                </li>
+              );
+            })}
           </ol>
+          {pageCount > 1 && (
+            <div
+              className={styles.pagination}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <button
+                type="button"
+                className={styles.pageBtn}
+                onClick={goPrev}
+                disabled={safePage === 0}
+                aria-label="Previous page"
+              >
+                ◀
+              </button>
+              <span className={styles.pageInfo}>
+                {safePage + 1} / {pageCount}
+              </span>
+              <button
+                type="button"
+                className={styles.pageBtn}
+                onClick={goNext}
+                disabled={safePage >= pageCount - 1}
+                aria-label="Next page"
+              >
+                ▶
+              </button>
+            </div>
+          )}
         </div>
       )}
-    </button>
+    </div>
   );
 }
