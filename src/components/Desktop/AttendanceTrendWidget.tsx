@@ -56,6 +56,47 @@ export default function AttendanceTrendWidget() {
     return { points, path, area, max, min };
   }, [sessions]);
 
+  const topAttenders = useMemo(() => {
+    const byEmail = new Map<
+      string,
+      {
+        name: string;
+        sessions: number;
+        totalSeconds: number;
+        lastSessionNumber: number;
+      }
+    >();
+
+    for (const session of sessions) {
+      for (const p of session.participants) {
+        if (p.role === 'Organizer') continue;
+        const key = p.email.toLowerCase();
+        const existing = byEmail.get(key);
+        if (existing) {
+          existing.sessions += 1;
+          existing.totalSeconds += p.durationSeconds;
+          if (session.sessionNumber > existing.lastSessionNumber) {
+            existing.name = p.name;
+            existing.lastSessionNumber = session.sessionNumber;
+          }
+        } else {
+          byEmail.set(key, {
+            name: p.name,
+            sessions: 1,
+            totalSeconds: p.durationSeconds,
+            lastSessionNumber: session.sessionNumber,
+          });
+        }
+      }
+    }
+
+    return [...byEmail.values()]
+      .sort(
+        (a, b) => b.sessions - a.sessions || b.totalSeconds - a.totalSeconds
+      )
+      .slice(0, 5);
+  }, [sessions]);
+
   if (sessions.length === 0) {
     return null;
   }
@@ -163,6 +204,35 @@ export default function AttendanceTrendWidget() {
           </g>
         ))}
       </svg>
+
+      {topAttenders.length > 0 && (
+        <div className={styles.leaderboard}>
+          <div className={styles.leaderboardHeader}>
+            <span className={styles.leaderboardTitle}>Top Attenders</span>
+            <span className={styles.leaderboardHint}>
+              {sessions.length} sessions
+            </span>
+          </div>
+          <ol className={styles.leaderboardList}>
+            {topAttenders.map((a, i) => (
+              <li key={a.name} className={styles.leaderboardRow}>
+                <span className={styles.rank} data-rank={i + 1}>
+                  {i + 1}
+                </span>
+                <span className={styles.attenderName}>{a.name}</span>
+                <span className={styles.attenderMetrics}>
+                  <span className={styles.attenderCount}>
+                    {a.sessions}/{sessions.length}
+                  </span>
+                  <span className={styles.attenderMinutes}>
+                    {Math.round(a.totalSeconds / 60)}m
+                  </span>
+                </span>
+              </li>
+            ))}
+          </ol>
+        </div>
+      )}
     </button>
   );
 }

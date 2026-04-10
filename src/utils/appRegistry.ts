@@ -7,6 +7,7 @@ import { PresentationApp } from '../components/apps/Presentation/PresentationApp
 import { Presentation2App } from '../components/apps/Presentation2/Presentation2App';
 import { Presentation3App } from '../components/apps/Presentation3/Presentation3App';
 import { Presentation4App } from '../components/apps/Presentation4/Presentation4App';
+import { Presentation5App } from '../components/apps/Presentation5/Presentation5App';
 import { Terminal } from '../components/apps/Terminal/Terminal';
 import { Snake } from '../components/apps/games/Snake/Snake';
 import { Tetris } from '../components/apps/games/Tetris/Tetris';
@@ -120,6 +121,19 @@ export const APP_REGISTRY: Record<string, AppDefinition> = {
     defaultHeight: 640,
     minWidth: 500,
     minHeight: 380,
+    singleton: true,
+    tileSize: 'wide',
+    hiddenFromDesktop: true,
+  },
+  'presentation5': {
+    id: 'presentation5',
+    name: 'AGI y El futuro del trabajo',
+    icon: '🤖',
+    component: Presentation5App,
+    defaultWidth: 1120,
+    defaultHeight: 720,
+    minWidth: 640,
+    minHeight: 420,
     singleton: true,
     tileSize: 'wide',
     hiddenFromDesktop: true,

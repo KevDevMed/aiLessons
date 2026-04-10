@@ -164,6 +164,120 @@
   letter-spacing: 0.3px;
 }
 
+.leaderboard {
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.leaderboardHeader {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.leaderboardTitle {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--win-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+.leaderboardHint {
+  font-size: 9px;
+  font-weight: 500;
+  color: var(--win-text-secondary);
+  opacity: 0.65;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.leaderboardList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.leaderboardRow {
+  display: grid;
+  grid-template-columns: 16px 1fr auto;
+  align-items: center;
+  gap: 8px;
+  padding: 2px 0;
+  font-size: 11px;
+  line-height: 1.2;
+}
+
+.rank {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  font-size: 9px;
+  font-weight: 700;
+  color: var(--win-text-secondary);
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.rank[data-rank='1'] {
+  color: #11142a;
+  background: var(--win-accent-light);
+  border-color: var(--win-accent-light);
+}
+
+.rank[data-rank='2'] {
+  color: var(--win-text-primary);
+  background: rgba(200, 210, 230, 0.18);
+  border-color: rgba(200, 210, 230, 0.35);
+}
+
+.rank[data-rank='3'] {
+  color: var(--win-text-primary);
+  background: rgba(205, 140, 80, 0.18);
+  border-color: rgba(205, 140, 80, 0.4);
+}
+
+.attenderName {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--win-text-primary);
+  font-weight: 500;
+}
+
+.attenderMetrics {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+  font-variant-numeric: tabular-nums;
+}
+
+.attenderCount {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--win-text-secondary);
+  letter-spacing: 0.2px;
+}
+
+.attenderMinutes {
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--win-text-secondary);
+  opacity: 0.7;
+  letter-spacing: 0.2px;
+}
+
 /* Hide on very small screens so it doesn't cover icons */
 @media (max-width: 640px) {
   .widget {

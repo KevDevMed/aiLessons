@@ -107,6 +107,16 @@ const mockTracks: Record<string, TrackInfo> = {
     gradient: '',
     youtubeId: 'yuswzkaUtq0',
   },
+  'session-5-recording': {
+    title: 'AGI y El futuro del trabajo',
+    artist: '',
+    album: 'Session 5',
+    duration: '',
+    durationSeconds: 0,
+    type: 'video',
+    gradient: '',
+    youtubeId: 'UNmh0IwK3_w',
+  },
 };
 
 function formatTime(seconds: number): string {

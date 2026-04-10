@@ -749,6 +749,288 @@ IMPORTANT NOTES
 - Always set spending limits on API keys
 - English prompts produce better results than Spanish
 - The best model depends on YOUR specific task, not overall rankings`,
+
+  // ========== SESSION 5 DOCUMENTS ==========
+
+  's5-workshop-notes': `Workshop Notes: AGI y El futuro del trabajo - Session 5
+========================================================
+
+Key Concepts:
+- AGI = a machine capable of doing ANY job better than a human — not just chat, not just code
+- The people saying "AGI is coming" are the same people building it (Altman, Amodei, Musk) —
+  they are not outside commentators, they are moving tens of billions of dollars on this thesis
+- Money is not a "thing" — it is a coupon for someone else's time. If AGI can do the work,
+  the coupon loses its original meaning.
+- The economy is already splitting: capital (S&P 500) is going up while labor (job openings)
+  is going down. The correlation broke in 2022.
+- Scarcity is shifting from PEOPLE to PHYSICAL INFRASTRUCTURE — chips, energy, land.
+- OpenAI loses billions every year and is valued at $852B. That is not a business bet —
+  it is a survival ticket to the last industrial revolution.
+- AGI is no longer science fiction. The evidence is audited, dated, and public:
+  IMO gold medal, PhD-level science benchmarks, top 5% cybersecurity, situational awareness.
+
+The Silicon Valley Voices:
+- Sam Altman (OpenAI): "We want to flood the world with intelligence." Publicly acknowledged
+  that AI changes how capitalism works. Predicts AGI around 2025.
+- Dario Amodei (Anthropic): "A country of geniuses inside a data center." Estimates powerful
+  AI in 1-2 years. A century of scientific progress compressed into a decade. AGI by 2026-27.
+- Elon Musk (Tesla, xAI, SpaceX): "AGI in 2026. By 2030, AI will surpass all of humanity."
+  The currency of the future is not the dollar — it is watts.
+- Shane Legg (Google DeepMind co-founder): More conservative, targets 2028.
+
+The Financial Mystery:
+- OpenAI 2024 revenue: $3.7B. 2024 losses: -$5B. Projected 2026 losses: -$14B.
+  Projected cumulative losses by 2029: -$115B.
+- April 2026 valuation: $852B (larger than Argentina's GDP). New investment round: $122B.
+- Microsoft, Amazon, Google, and Nvidia are putting $30B into AI infrastructure in 2026.
+- This only makes sense if you are not buying software. You are buying a seat on the last
+  industrial revolution before AGI.
+
+The Physical Bottleneck:
+- Electricity: 1,000 TWh for data centers by 2026 — equivalent to all of Japan's consumption.
+  (Source: International Energy Agency)
+- Chips: $25B price tag for Terafab, Musk's new chip foundry.
+- Land: 134 GW projected US data center demand by 2030. (Source: S&P Global)
+- In the US, data centers already push home electricity bills up $16-18/month.
+  Carnegie Mellon projects an 8% nationwide increase by 2030.
+- "Very soon we will produce more chips than we can turn on." — Elon Musk, Davos 2026
+
+The Divergence (2000-2024):
+- Job openings: -40% contraction in the labor market
+- S&P 500: +50% valuation at all-time highs
+- Companies are worth more while needing fewer people than ever
+- The structural break happened in 2022 — before ChatGPT launched publicly
+
+Evidence AGI Is Already Here:
+- Reasoning: gold medal at the International Mathematical Olympiad (top 1%)
+- Science: outperformed PhD-level experts on science evaluations
+- Security: top 5% in cybersecurity competitions against human professionals
+- Awareness: models detect when they are being evaluated and change their behavior
+- Risk: we cannot rule out AI assistance in biological weapons creation (Level 4 concern)
+- Status: autonomous multi-step planning is a current, demonstrated capability
+
+The Skeptics' View:
+- CEOs exaggerate to attract investment
+- Training data is running out
+- Musk already predicted AGI for 2025 and it did not happen
+- Current architectures have fundamental limits
+
+The Consensus View:
+- The trajectory is clear and undeniable
+- Billionaires are acting with real money, not just words
+- The race for physical infrastructure has already started
+- Whether it is 2027 or 2035, the change is coming
+
+Why This Matters:
+- In a world where intelligence is free, whoever controls the PHYSICAL foundations —
+  chips, energy, land — controls everything else.
+- The future is not being predicted. It is being BOUGHT, right now, every single day.
+- Pay attention to who owns the factories, the grid, and the land — that is where
+  power is concentrating.
+
+Advice:
+- Do not dismiss this as hype. The people spending the money have more information than you do.
+- Do not panic about the timeline. 2026 vs 2030 does not change the direction.
+- Look at what YOU can build or own in this new economy — the assets that matter are
+  shifting from human time to physical infrastructure.
+- Keep learning to use the tools. "The illiterate of this century are those who cannot
+  learn, unlearn, and relearn." — Alvin Toffler`,
+
+  's5-quick-reference': `Quick Reference Card - Session 5
+=================================
+
+AGI DEFINITION
+  "A machine capable of doing ANY job better than a human."
+  Not chat. Not code. Every job. That is the target.
+
+WHO IS PREDICTING WHAT
+  OpenAI    // Sam Altman        "We know how to build AGI"     2025
+  Anthropic // Dario Amodei      AGI in 1-2 years               2026-27
+  xAI       // Elon Musk         "AGI in 2026"                   2026
+  DeepMind  // Shane Legg        More conservative               2028
+
+WHAT IS MONEY, REALLY?
+  A bill = a coupon for someone else's time.
+  Chain: farmer → mechanic → trucker → engineer → cashier
+  If AGI replaces every link, money loses its original purpose.
+
+THE DIVERGENCE (2000-2024)
+  Job openings:   -40%   (labor market contracting)
+  S&P 500:        +50%   (valuations at all-time highs)
+  Structural break: 2022
+  Takeaway: companies worth more, needing fewer people than ever
+
+WHAT IS STILL SCARCE
+  Electricity: 1,000 TWh for data centers by 2026 (= all of Japan)
+  Chips:       $25B for Terafab (Musk's new chip fab)
+  Land:        134 GW US data center demand by 2030
+
+HOUSEHOLD IMPACT (US)
+  Electricity bills: +$16-18/month already from data centers
+  Projected increase by 2030: +8% nationally (Carnegie Mellon)
+
+OPENAI FINANCIALS
+  2024 revenue:               $3.7B
+  2024 losses:                -$5B
+  2026 projected losses:      -$14B
+  2029 cumulative losses:     -$115B
+  April 2026 valuation:       $852B  (larger than Argentina's GDP)
+  April 2026 new investment:  $122B
+  Verdict: NOT a business bet // It is a survival ticket
+
+BIG TECH AI INFRA SPEND (2026)
+  Microsoft + Amazon + Google + Nvidia: $30B combined
+  They are not buying software.
+  They are buying the last industrial revolution.
+
+EVIDENCE AGI IS NOT SCI-FI
+  Reasoning:   Gold medal, International Mathematical Olympiad (top 1%)
+  Science:     Beat PhD-level experts on benchmarks
+  Security:    Top 5% in cybersecurity competitions
+  Awareness:   Detects when it is being evaluated
+  Risk:        Biological weapons assistance not ruled out (Level 4)
+  Status:      Autonomous multi-step planning is current, not future
+
+THE CLOSING PILLARS
+  Chips   — who makes them
+  Energy  — who controls it
+  Land    — who owns it
+
+KEY QUOTES
+  "We want to flood the world with intelligence." — Sam Altman
+  "A country of geniuses inside a data center." — Dario Amodei
+  "The currency of the future is not the dollar — it is watts." — Elon Musk
+  "Very soon we will produce more chips than we can turn on." — Musk, Davos 2026
+
+SOURCES REFERENCED
+  International Energy Agency (electricity demand projections)
+  S&P Global (data center power demand)
+  Reuters / Bloomberg (OpenAI valuation + losses)
+  Carnegie Mellon (household electricity impact study)
+  International AI Safety Report 2026 (audited capabilities)
+
+THE ONE LINE TO REMEMBER
+  In a world where intelligence is free, whoever controls the
+  physical foundations controls everything else.`,
+
+  's5-silicon-valley-voices': `Silicon Valley Voices on AGI — Session 5
+==========================================
+
+This is the raw material for the session: direct quotes and positions from the people
+actually building AGI. These are not journalists or pundits — these are CEOs moving
+tens of billions of dollars on the thesis that AGI is imminent.
+
+
+==========================================================================
+SAM ALTMAN // CEO of OpenAI
+==========================================================================
+
+Key quote:
+  "We want to flood the world with intelligence."
+
+Position:
+  - Publicly acknowledged that AI changes how capitalism itself works
+  - January 2025: "We know how to build AGI"
+  - OpenAI's entire business model is built on this thesis
+  - Frames intelligence as a commodity that can be distributed like electricity
+
+Why it matters:
+  Altman is the public face of the AGI push. His company loses billions every year
+  and is valued at $852B (April 2026). That is not a normal business — it is a bet
+  that whoever gets to AGI first captures the next industrial revolution.
+
+
+==========================================================================
+DARIO AMODEI // CEO of Anthropic
+==========================================================================
+
+Key quote:
+  "A country of geniuses inside a data center."
+
+Position:
+  - Estimates powerful AI is 1-2 years away
+  - A century of scientific progress compressed into a decade
+  - Projects AGI by 2026-2027
+  - Founded Anthropic specifically to build AGI "safely"
+
+Why it matters:
+  Amodei is the safety-focused voice in the room, which makes his aggressive timeline
+  even more striking. If the person most worried about AI risk is still building it
+  as fast as possible, the race is real.
+
+
+==========================================================================
+ELON MUSK // CEO of Tesla, xAI, SpaceX
+==========================================================================
+
+Key quotes:
+  "AGI in 2026. By 2030, AI will surpass all of humanity."
+  "The currency of the future is not the dollar — it is watts."
+  "Very soon we will produce more chips than we can turn on." (Davos, 2026)
+
+Position:
+  - Bet on xAI, Grok, and Terafab (a new $25B chip foundry)
+  - Frames the bottleneck as ENERGY, not algorithms
+  - Has a history of overshooting timelines BUT consistently ships the hardware
+  - Building the physical infrastructure to match his own predictions
+
+Why it matters:
+  Musk has famously predicted AGI before (and missed). But his 2026 bet is different:
+  he is spending real money on chip fabs and energy, not just talking. If you follow
+  the capex, you find Musk putting infrastructure on the ground.
+
+
+==========================================================================
+SHANE LEGG // Co-founder of Google DeepMind
+==========================================================================
+
+Position:
+  - More conservative than the others — targets AGI around 2028
+  - Has been predicting AGI for nearly two decades
+  - His 2028 estimate has been stable for years (he has not moved it up)
+
+Why it matters:
+  Legg is the long-term, academic voice. He was predicting AGI when the others were
+  still writing papers. Even his slower estimate is less than 3 years out. When the
+  most conservative voice in the room says 2028, the question stops being "if" and
+  becomes "what year exactly."
+
+
+==========================================================================
+THE MONEY BEHIND THE WORDS
+==========================================================================
+
+These are not just opinions. These are capital commitments:
+
+  OpenAI       $852B valuation // $122B new round // -$115B projected losses
+  Microsoft    Part of a $30B AI infra commitment for 2026
+  Amazon       Part of a $30B AI infra commitment for 2026
+  Google       Part of a $30B AI infra commitment for 2026
+  Nvidia       Part of a $30B AI infra commitment for 2026
+  xAI          $25B Terafab chip foundry
+
+Total capex in 2026 on AI infrastructure: $155B+
+
+For comparison, the US Manhattan Project in inflation-adjusted dollars was about $30B.
+The AI race is already 5x bigger, running right now, and accelerating.
+
+
+==========================================================================
+THE TAKEAWAY
+==========================================================================
+
+When the people building the technology, controlling the capital, and placing the bets
+ALL agree on the direction (even if they disagree on the exact year), it is not a
+marketing story. It is a thesis worth taking seriously.
+
+The question is not whether AGI arrives in 2026 or 2030. The question is:
+
+  - What do you own that holds value when intelligence is free?
+  - What do you build that cannot be commoditized?
+  - What do you learn that cannot be unlearned?
+
+"The illiterate of the 21st century are not those who cannot read and write, but those
+who cannot learn, unlearn, and relearn." — Alvin Toffler`,
 };
 
 export const presentationFolders: PresentationFolder[] = [
@@ -942,6 +1224,56 @@ export const presentationFolders: PresentationFolder[] = [
         icon: '💻',
         description: 'Practice commands in the terminal',
         action: 'launch:terminal',
+      },
+    ],
+  },
+  {
+    id: 'agi-future-work',
+    name: 'AGI y El futuro del trabajo',
+    icon: '🤖',
+    color: '#E8B547',
+    resources: [
+      {
+        name: 'AGI y El futuro del trabajo Presentation',
+        type: 'presentation',
+        icon: '🧠',
+        description: '10 slides on AGI, money, the capital/labor divergence, and the future of work',
+        action: 'launch:presentation5',
+      },
+      {
+        name: 'Workshop Notes',
+        type: 'document',
+        icon: '📝',
+        description: 'Key concepts, Silicon Valley predictions, and economic analysis from Session 5',
+        action: 'open-notepad:s5-workshop-notes',
+      },
+      {
+        name: 'Quick Reference Card',
+        type: 'document',
+        icon: '📄',
+        description: 'AGI timelines, key quotes, OpenAI financials, and physical scarcity at a glance',
+        action: 'open-notepad:s5-quick-reference',
+      },
+      {
+        name: 'Silicon Valley Voices',
+        type: 'document',
+        icon: '🗣️',
+        description: 'Direct quotes and positions from Altman, Amodei, Musk, and Legg',
+        action: 'open-notepad:s5-silicon-valley-voices',
+      },
+      {
+        name: 'Terminal',
+        type: 'tool',
+        icon: '💻',
+        description: 'Practice commands in the terminal',
+        action: 'launch:terminal',
+      },
+      {
+        name: 'Session Recording',
+        type: 'tool',
+        icon: '🎬',
+        description: 'AGI y El futuro del trabajo',
+        action: 'open-media:session-5-recording',
       },
     ],
   },
